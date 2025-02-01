@@ -39,6 +39,7 @@ public class RegisterTests {
             Assertions.assertTrue(ImageComparator.compareImages(new File(screenshotsPath + "/loginDiv.png"),
                     new File(comparatorsPath + "/loginDiv.png")));
         } catch (Exception ex) {
+            Assertions.fail(ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -55,6 +56,7 @@ public class RegisterTests {
             Assertions.assertTrue(ImageComparator.compareImages(new File(screenshotsPath + "/registerDiv.png"),
                     new File(comparatorsPath + "/registerDiv.png")));
         } catch (Exception ex) {
+            Assertions.fail(ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -77,6 +79,7 @@ public class RegisterTests {
             Assertions.assertTrue(ImageComparator.compareImages(new File(screenshotsPath + "/registerSuccess.png"),
                     new File(comparatorsPath + "/registerSuccess.png")));
         } catch (Exception ex) {
+            Assertions.fail(ex.getMessage());
             ex.printStackTrace();
         }
     }
