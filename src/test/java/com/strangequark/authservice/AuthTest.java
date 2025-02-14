@@ -1,8 +1,5 @@
 package com.strangequark.authservice;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.microsoft.playwright.APIRequest;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.RequestOptions;
@@ -45,17 +42,38 @@ public class AuthTest {
         APIResponse registerResponse = playwright.request().newContext()
                 .post("http://localhost:6001/auth/register", RequestOptions.create().setData(requestBody));
 
-        JsonObject jsonResponse = JsonParser.parseString(registerResponse.text()).getAsJsonObject();
-        String jwtToken = String.valueOf(jsonResponse.get("jwtToken"));
+        requestBody.remove("username");
+        requestBody.remove("password");
+
+        APIResponse enableUserResponse = playwright.request().newContext()
+                .post("http://localhost:6001/user/enableUser", RequestOptions.create().setData(requestBody));
+
+        assertTrue(enableUserResponse.ok());
+    }
+
+    @Test
+    public void registerEnableAndAuthenticateUser() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "test3");
+        requestBody.put("email", "email3@email.com");
+        requestBody.put("password", "password123!");
+
+        APIResponse registerResponse = playwright.request().newContext()
+                .post("http://localhost:6001/auth/register", RequestOptions.create().setData(requestBody));
 
         requestBody.remove("username");
         requestBody.remove("password");
 
-        APIResponse enableUserResponse = playwright.request().newContext(new APIRequest.NewContextOptions().setExtraHTTPHeaders(
-                        (Map<String, String>) new HashMap<>().put("Authorization", "Bearer " + jwtToken)
-                ))
+        APIResponse enableUserResponse = playwright.request().newContext()
                 .post("http://localhost:6001/user/enableUser", RequestOptions.create().setData(requestBody));
 
-        assertTrue(enableUserResponse.ok());
+        requestBody.remove("email");
+        requestBody.put("username", "test3");
+        requestBody.put("password", "password123!");
+
+        APIResponse authenticationResponse = playwright.request().newContext()
+                .post("http://localhost:6001/auth/authenticate", RequestOptions.create().setData(requestBody));
+
+        assertTrue(authenticationResponse.ok());
     }
 }
