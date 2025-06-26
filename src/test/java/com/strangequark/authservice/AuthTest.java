@@ -1,5 +1,7 @@
 package com.strangequark.authservice;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
@@ -38,23 +40,23 @@ public class AuthTest {
         testPassword = UUID.randomUUID().toString();
     }
 
-    @AfterEach
-    public void afterEach() {
-        APIResponse response = deleteUser(testUsername, testPassword);
-        if (!response.ok()) {
-            System.err.println("Cleanup failed for " + testUsername + ": " + response.status() + " - " + response.text());
-        }
-    }
+//    @AfterEach
+//    public void afterEach() {
+//        APIResponse response = deleteUser(testUsername, testPassword);
+//        if (!response.ok()) {
+//            System.err.println("Cleanup failed for " + testUsername + ": " + response.status() + " - " + response.text());
+//        }
+//    }
 
     @Test
     public void registerTest() {
-        APIResponse response = registerUser(testUsername, testEmail, testPassword);
+        APIResponse response = register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
     }
 
     @Test
-    public void registerAndEnableUser() {
-        APIResponse response = registerUser(testUsername, testEmail, testPassword);
+    public void enableUserTest() {
+        APIResponse response = register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
 
         response = enableUser(testEmail);
@@ -62,18 +64,34 @@ public class AuthTest {
     }
 
     @Test
-    public void registerEnableAndAuthenticateUser() {
-        APIResponse response = registerUser(testUsername, testEmail, testPassword);
+    public void authenticateTest() {
+        APIResponse response = register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
 
         response = enableUser(testEmail);
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
-        response = authenticateUser(testUsername, testPassword);
+        response = authenticate(testUsername, testPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
     }
 
-    private APIResponse registerUser(String username, String email, String password) {
+    @Test
+    public void serveAccessTokenTest() {
+        APIResponse response = register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+
+        response = enableUser(testEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+
+        response = serveAccessToken(extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+    }
+
+    //Helper functions
+    private APIResponse register(String username, String email, String password) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("email", email);
@@ -89,12 +107,17 @@ public class AuthTest {
         return apiRequestContext.post(BASE_URL + "/user/enable-user", RequestOptions.create().setData(requestBody));
     }
 
-    private APIResponse authenticateUser(String username, String password) {
+    private APIResponse authenticate(String username, String password) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("password", password);
 
         return apiRequestContext.post(BASE_URL + "/authenticate", RequestOptions.create().setData(requestBody));
+    }
+
+    private APIResponse serveAccessToken(String refreshToken) {
+        return apiRequestContext.get(BASE_URL + "/access", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + refreshToken));
     }
 
     private APIResponse deleteUser(String username, String password) {
@@ -103,5 +126,14 @@ public class AuthTest {
         requestBody.put("password", password);
 
         return apiRequestContext.post(BASE_URL + "/user/delete-user", RequestOptions.create().setData(requestBody));
+    }
+
+    private String extractJwt(APIResponse response) {
+        if (response.ok()) {
+            JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+            return jsonObject.get("jwtToken").getAsString();
+        } else {
+            throw new RuntimeException("Unable to extract JWT from failed response: " + response.status());
+        }
     }
 }
