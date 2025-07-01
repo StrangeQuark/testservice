@@ -31,7 +31,7 @@ public class RegisterTests {
     @Test
     public void ensureLoginDivLoading() {
         try {
-            page.navigate("localhost:3001");
+            page.navigate("localhost:6080");
             page.click("id=loginButton");
             page.locator("id=login-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
             page.locator("id=login-div").screenshot(new Locator.ScreenshotOptions().setPath(Paths.get(screenshotsPath + "/loginDiv.png")));
@@ -47,7 +47,7 @@ public class RegisterTests {
     @Test
     public void ensureRegisterDivLoading() {
         try {
-            page.navigate("localhost:3001");
+            page.navigate("localhost:6080");
             page.click("id=loginButton");
             page.click("id=sign-up-link");
             page.locator("id=register-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
@@ -64,7 +64,7 @@ public class RegisterTests {
     @Test
     public void registerTest() {
         try {
-            page.navigate("localhost:3001");
+            page.navigate("localhost:6080");
             page.click("id=loginButton");
             page.click("id=sign-up-link");
             page.locator("id=username").fill("testUsername");
