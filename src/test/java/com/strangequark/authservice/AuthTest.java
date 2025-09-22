@@ -172,6 +172,75 @@ public class AuthTest {
         assertEquals("User is disabled", jsonObject.get("errorMessage").getAsString());
     }
 
+    @Test
+    public void updatePasswordTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        String newPassword = "newTestPassword";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("password", testPassword);
+        requestBody.put("newPassword", newPassword);
+
+        APIResponse response = updatePassword(requestBody, accessToken);
+        assertTrue(response.ok(), "Update password failed: " + response.status() + " - " + response.text());
+
+        // Set the testPassword to the newPassword for afterEach method
+        testPassword = newPassword;
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Update password login attempt failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void updateEmailTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        String newEmail = "new@email.com";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newEmail", newEmail);
+        requestBody.put("password", testPassword);
+
+        APIResponse response = updateEmail(requestBody, accessToken);
+        assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
+
+        response = searchUsers(testUsername, accessToken);
+        assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals(newEmail, jsonObject.get("email").getAsString());
+    }
+
+    @Test
+    public void addAuthorizationsToUserTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        List<String> auths = new ArrayList<>();
+        auths.add("Auth 1");
+        auths.add("Auth 2");
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("username", testUsername);
+        requestBody.put("authorizations", auths);
+
+        APIResponse response = addAuthorizationsToUser(requestBody, accessToken);
+        assertTrue(!response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals("Only SUPER or ADMIN users can assign roles", jsonObject.get("errorMessage").getAsString());
+    }
+
+    @Test
+    public void removeAuthorizationsTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        List<String> auths = new ArrayList<>();
+        auths.add("Auth 1");
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("username", testUsername);
+        requestBody.put("authorizations", auths);
+
+        APIResponse response = removeAuthorizations(requestBody, accessToken);
+        assertTrue(response.ok(), "Remove authorizations test failed: " + response.status() + " - " + response.text());
+    }
+
     private String registerEnableAuthenticateAccess() {
         APIResponse response = register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
@@ -249,6 +318,26 @@ public class AuthTest {
         requestBody.put("password", password);
 
         return apiRequestContext.post(BASE_URL + "/user/delete-user", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse updatePassword(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/update-password", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse updateEmail(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/update-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse addAuthorizationsToUser(Map<String, Object> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/add-authorizations-to-user", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse removeAuthorizations(Map<String, Object> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/remove-authorizations", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
