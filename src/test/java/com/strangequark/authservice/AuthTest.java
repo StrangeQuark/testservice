@@ -9,9 +9,7 @@ import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.utility.AuthUtility;
 import org.junit.jupiter.api.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,6 +105,89 @@ public class AuthTest {
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
     }
 
+    @Test
+    public void getUserIdTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        APIResponse response = getUserId(testUsername, accessToken);
+        assertTrue(response.ok(), "Get user id failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void searchUsersByUsernameTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        APIResponse response = searchUsers(testUsername, accessToken);
+        assertTrue(response.ok(), "Search users by username failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals(testUsername, jsonObject.get("username").getAsString());
+        assertEquals(testEmail, jsonObject.get("email").getAsString());
+    }
+
+    @Test
+    public void searchUsersByEmailTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        APIResponse response = searchUsers(testEmail, accessToken);
+        assertTrue(response.ok(), "Search users by email failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals(testUsername, jsonObject.get("username").getAsString());
+        assertEquals(testEmail, jsonObject.get("email").getAsString());
+    }
+
+    @Test
+    public void getUserDetailsByIdsTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        APIResponse response = getUserId(testUsername, accessToken);
+        assertTrue(response.ok(), "Get user id failed: " + response.status() + " - " + response.text());
+
+        List<String> ids = new ArrayList<>();
+        ids.add(response.text().replace("\"", ""));
+
+        response = getUserDetailsByIds(ids, accessToken);
+        assertTrue(response.ok(), "Get user details by ids failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonArray().get(0).getAsJsonObject();
+        assertEquals(testUsername, jsonObject.get("username").getAsString());
+        assertEquals(testEmail, jsonObject.get("email").getAsString());
+    }
+
+    @Test
+    public void disableUserByUsernameTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", testUsername);
+
+        APIResponse response = disableUser(requestBody, accessToken);
+        assertTrue(response.ok(), "Disable user failed: " + response.status() + " - " + response.text());
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(!response.ok(), "Disable user failed - User still enabled: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals("User is disabled", jsonObject.get("errorMessage").getAsString());
+    }
+
+    private String registerEnableAuthenticateAccess() {
+        APIResponse response = register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        // Integration function start: Email
+        response = enableUser(testEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+
+        response = serveAccessToken(extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+
+        return extractJwt(response);
+    }
+
     private APIResponse healthcheck() {
         return apiRequestContext.get(BASE_URL + "/health");
     }
@@ -128,6 +209,11 @@ public class AuthTest {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
     }// Integration function end: Email
 
+    private APIResponse disableUser(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/disable-user", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     private APIResponse authenticate(String username, String password) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
@@ -141,12 +227,26 @@ public class AuthTest {
                 .setHeader("Authorization", "Bearer " + refreshToken));
     }
 
+    private APIResponse getUserId(String username, String accessToken) {
+        return apiRequestContext.get(BASE_URL + "/user/get-user-id?username=" + username, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse searchUsers(String query, String accessToken) {
+        return apiRequestContext.get(BASE_URL + "/user/search-users?query=" + query, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse getUserDetailsByIds(List<String> ids, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/get-user-details-by-ids", RequestOptions.create()
+                .setData(ids)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     private APIResponse deleteUser(String username, String password, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("password", password);
-
-        System.out.println(accessToken);
 
         return apiRequestContext.post(BASE_URL + "/user/delete-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
