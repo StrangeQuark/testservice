@@ -13,6 +13,7 @@ public class AuthUtility {
     private Playwright playwright;
     private APIRequestContext apiRequestContext;
     private final String SERVICE_SECRET_TEST;
+    private final String AUTH_BOOTSTRAP_SECRET_KEY;
 
     private final String BASE_URL = "http://localhost:6001/api/auth";
 
@@ -20,18 +21,28 @@ public class AuthUtility {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
 
-        String secret = System.getenv("SERVICE_SECRET_TEST");
-
-        if (secret == null || secret.isEmpty()) {
+        // Attempt to get the TestService service secret for auth integrations
+        String serviceSecret = System.getenv("SERVICE_SECRET_TEST");
+        if (serviceSecret == null || serviceSecret.isEmpty()) {
             Dotenv dotenv = Dotenv.load();
-            secret = dotenv.get("SERVICE_SECRET_TEST");
+            serviceSecret = dotenv.get("SERVICE_SECRET_TEST");
         }
-
-        if (secret == null || secret.isEmpty()) {
+        if (serviceSecret == null || serviceSecret.isEmpty()) {
             throw new IllegalStateException("SERVICE_SECRET_TEST is not set in environment variables or .env file.");
         }
+        SERVICE_SECRET_TEST = serviceSecret;
 
-        SERVICE_SECRET_TEST = secret;
+        // Attempt to get the AuthService bootstrap secret key for bootstrapSuperUserTest
+        String bootstrapSecret = System.getenv("AUTH_BOOTSTRAP_SECRET_KEY");
+        if (bootstrapSecret == null || bootstrapSecret.isEmpty()) {
+            Dotenv dotenv = Dotenv.load();
+            bootstrapSecret = dotenv.get("AUTH_BOOTSTRAP_SECRET_KEY");
+        }
+        if (bootstrapSecret == null || bootstrapSecret.isEmpty()) {
+            throw new IllegalStateException("AUTH_BOOTSTRAP_SECRET_KEY is not set in environment variables or .env file.");
+        }
+
+        AUTH_BOOTSTRAP_SECRET_KEY = bootstrapSecret;
     }
 
     public String authenticateServiceAccount() {
@@ -53,6 +64,14 @@ public class AuthUtility {
         } catch (Exception ex) {
             return ex.getMessage();
         }
+    }
+
+    public String getAuthBootstrapSecretKey() {
+        return AUTH_BOOTSTRAP_SECRET_KEY;
+    }
+
+    public String getServiceSecretTest() {
+        return SERVICE_SECRET_TEST;
     }
 }
 
