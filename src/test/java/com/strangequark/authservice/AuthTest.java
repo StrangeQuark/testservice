@@ -161,10 +161,7 @@ public class AuthTest {
     public void disableUserByUsernameTest() {
         String accessToken = registerEnableAuthenticateAccess();
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", testUsername);
-
-        APIResponse response = disableUser(requestBody, accessToken);
+        APIResponse response = disableUser(testUsername, accessToken);
         assertTrue(response.ok(), "Disable user failed: " + response.status() + " - " + response.text());
 
         response = authenticate(testUsername, testPassword);
@@ -179,11 +176,7 @@ public class AuthTest {
         String accessToken = registerEnableAuthenticateAccess();
         String newPassword = "newTestPassword";
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("password", testPassword);
-        requestBody.put("newPassword", newPassword);
-
-        APIResponse response = updatePassword(requestBody, accessToken);
+        APIResponse response = updatePassword(testPassword, newPassword, accessToken);
         assertTrue(response.ok(), "Update password failed: " + response.status() + " - " + response.text());
 
         // Set the testPassword to the newPassword for afterEach method
@@ -194,20 +187,25 @@ public class AuthTest {
 
     @Test
     public void addAuthorizationsToUserTest() {
-        String accessToken = registerEnableAuthenticateAccess();
+        APIResponse response = bootstrapSuperUser(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+
+        response = serveAccessToken(extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+
+        String accessToken = extractJwt(response);
         List<String> auths = new ArrayList<>();
         auths.add("Auth 1");
         auths.add("Auth 2");
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("username", testUsername);
-        requestBody.put("authorizations", auths);
-
-        APIResponse response = addAuthorizationsToUser(requestBody, accessToken);
-        assertFalse(response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
+        response = addAuthorizationsToUser(testUsername, auths, accessToken);
+        assertTrue(response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
-        assertEquals("Only SUPER or ADMIN users can add authorizations to users", jsonObject.get("errorMessage").getAsString());
+        assertEquals("Authorizations successfully added", jsonObject.get("message").getAsString());
     }
 
     @Test
@@ -216,11 +214,7 @@ public class AuthTest {
         List<String> auths = new ArrayList<>();
         auths.add("Auth 1");
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("username", testUsername);
-        requestBody.put("authorizations", auths);
-
-        APIResponse response = removeAuthorizations(requestBody, accessToken);
+        APIResponse response = removeAuthorizations(testUsername, auths, accessToken);
         assertTrue(response.ok(), "Remove authorizations test failed: " + response.status() + " - " + response.text());
     }
 
@@ -238,20 +232,16 @@ public class AuthTest {
     @Test
     public void updateEmailTest() {
         String accessToken = registerEnableAuthenticateAccess();
-        String newEmail = "new@email.com";
+        testEmail = "new@email.com";
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("newEmail", newEmail);
-        requestBody.put("password", testPassword);
-
-        APIResponse response = updateEmail(requestBody, accessToken);
+        APIResponse response = updateEmail(testEmail, testPassword, accessToken);
         assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
 
         response = searchUsers(testUsername, accessToken);
         assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
-        assertEquals(newEmail, jsonObject.get("email").getAsString());
+        assertEquals(testEmail, jsonObject.get("email").getAsString());
     }
 
     @Test
@@ -259,11 +249,7 @@ public class AuthTest {
         String accessToken = registerEnableAuthenticateAccess();
         testUsername = "newUsername";
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("newUsername", testUsername);
-        requestBody.put("password", testPassword);
-
-        APIResponse response = updateUsername(requestBody, accessToken);
+        APIResponse response = updateUsername(testUsername, testPassword, accessToken);
         assertTrue(response.ok(), "Update username failed: " + response.status() + " - " + response.text());
 
         // We have to re-fetch the accessToken since the user's username has changed
@@ -284,11 +270,7 @@ public class AuthTest {
     public void updateRoleTest() {
         String accessToken = registerEnableAuthenticateAccess();
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("newRole", "SUPER");
-        requestBody.put("username", testUsername);
-
-        APIResponse response = updateRole(requestBody, accessToken);
+        APIResponse response = updateRole("SUPER", testUsername,  accessToken);
         assertFalse(response.ok(), "Update role failed: " + response.status() + " - " + response.text());
     }
     // Integration function start: Email
@@ -296,48 +278,20 @@ public class AuthTest {
     public void sendPasswordResetEmailTest() {
         String accessToken = registerEnableAuthenticateAccess();
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("email", testEmail);
-
-        APIResponse response = sendPasswordResetEmail(requestBody, accessToken);
+        APIResponse response = sendPasswordResetEmail(testEmail, accessToken);
         assertTrue(response.ok(), "Send password reset email failed: " + response.status() + " - " + response.text());
     } // Integration function end: Email
 
     @Test
     public void bootstrapSuperUserTest() {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", testUsername);
-        requestBody.put("email", testEmail);
-        requestBody.put("password", testPassword);
-
-        APIResponse response = bootstrapSuperUser(requestBody);
+        APIResponse response = bootstrapSuperUser(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void serviceAccountAuthenticationTest() {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("clientId", "test");
-        requestBody.put("clientPassword", authUtility.getServiceSecretTest());
-
-        APIResponse response = serviceAccountAuthenticate(requestBody);
+        APIResponse response = serviceAccountAuthenticate("test", authUtility.getServiceSecretTest());
         assertTrue(response.ok(), "Service account authentication failed: " + response.status() + " - " + response.text());
-    }
-
-    private String registerEnableAuthenticateAccess() {
-        APIResponse response = register(testUsername, testEmail, testPassword);
-        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
-        // Integration function start: Email
-        response = enableUser(testEmail);
-        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
-
-        response = authenticate(testUsername, testPassword);
-        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-
-        response = serveAccessToken(extractJwt(response));
-        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
-
-        return extractJwt(response);
     }
 
     private APIResponse healthcheck() {
@@ -361,7 +315,10 @@ public class AuthTest {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
     }// Integration function end: Email
 
-    private APIResponse disableUser(Map<String, String> requestBody, String accessToken) {
+    private APIResponse disableUser(String username, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+
         return apiRequestContext.post(BASE_URL + "/user/disable-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
@@ -404,48 +361,100 @@ public class AuthTest {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse updatePassword(Map<String, String> requestBody, String accessToken) {
+    private APIResponse updatePassword(String password, String newPassword, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("password", password);
+        requestBody.put("newPassword", newPassword);
+
         return apiRequestContext.post(BASE_URL + "/user/update-password", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse updateEmail(Map<String, String> requestBody, String accessToken) {
+    private APIResponse updateEmail(String newEmail, String password, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newEmail", newEmail);
+        requestBody.put("password", password);
+
         return apiRequestContext.post(BASE_URL + "/user/update-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse updateUsername(Map<String, String> requestBody, String accessToken) {
+    private APIResponse updateUsername(String newUsername, String password, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newUsername", newUsername);
+        requestBody.put("password", password);
+
         return apiRequestContext.post(BASE_URL + "/user/update-username", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse updateRole(Map<String, String> requestBody, String accessToken) {
+    private APIResponse updateRole(String role, String username, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newRole", role);
+        requestBody.put("username", username);
+
         return apiRequestContext.post(BASE_URL + "/user/update-role", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse sendPasswordResetEmail(Map<String, String> requestBody, String accessToken) {
+    private APIResponse sendPasswordResetEmail(String email, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", email);
+
         return apiRequestContext.post(BASE_URL + "/user/send-password-reset-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse bootstrapSuperUser(Map<String, String> requestBody) {
+    private APIResponse bootstrapSuperUser(String username, String email, String password) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+        requestBody.put("email", email);
+        requestBody.put("password", password);
+
         return apiRequestContext.post(BASE_URL + "/internal/bootstrap", RequestOptions.create().setData(requestBody)
                 .setHeader("X-BOOTSTRAP-SECRET", authUtility.getAuthBootstrapSecretKey()));
     }
 
-    private APIResponse serviceAccountAuthenticate(Map<String, String> requestBody) {
+    private APIResponse serviceAccountAuthenticate(String clientId, String clientPassword) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("clientId", clientId);
+        requestBody.put("clientPassword", clientPassword);
+
         return apiRequestContext.post(BASE_URL + "/service-account/authenticate", RequestOptions.create().setData(requestBody));
     }
 
-    private APIResponse addAuthorizationsToUser(Map<String, Object> requestBody, String accessToken) {
+    private APIResponse addAuthorizationsToUser(String username, List<String> auths,  String accessToken) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+        requestBody.put("authorizations", auths);
+
         return apiRequestContext.post(BASE_URL + "/user/add-authorizations-to-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    private APIResponse removeAuthorizations(Map<String, Object> requestBody, String accessToken) {
+    private APIResponse removeAuthorizations(String username, List<String> auths, String accessToken) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+        requestBody.put("authorizations", auths);
+
         return apiRequestContext.post(BASE_URL + "/user/remove-authorizations", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private String registerEnableAuthenticateAccess() {
+        APIResponse response = register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        // Integration function start: Email
+        response = enableUser(testEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+
+        response = serveAccessToken(extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+
+        return extractJwt(response);
     }
 
     private String extractJwt(APIResponse response) {
