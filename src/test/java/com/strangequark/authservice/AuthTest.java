@@ -44,7 +44,8 @@ public class AuthTest {
     @AfterEach
     public void afterEach(TestInfo testInfo) {
         // Skip teardown for healthcheckTest
-        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest")) {
+        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
+                testInfo.getTestMethod().get().getName().equals("deleteUserTest")) {
             return;
         }
 
@@ -191,25 +192,6 @@ public class AuthTest {
     }
 
     @Test
-    public void updateEmailTest() {
-        String accessToken = registerEnableAuthenticateAccess();
-        String newEmail = "new@email.com";
-
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("newEmail", newEmail);
-        requestBody.put("password", testPassword);
-
-        APIResponse response = updateEmail(requestBody, accessToken);
-        assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
-
-        response = searchUsers(testUsername, accessToken);
-        assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
-
-        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
-        assertEquals(newEmail, jsonObject.get("email").getAsString());
-    }
-
-    @Test
     public void addAuthorizationsToUserTest() {
         String accessToken = registerEnableAuthenticateAccess();
         List<String> auths = new ArrayList<>();
@@ -239,6 +221,62 @@ public class AuthTest {
 
         APIResponse response = removeAuthorizations(requestBody, accessToken);
         assertTrue(response.ok(), "Remove authorizations test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void deleteUserTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        APIResponse response = deleteUser(testUsername, testPassword, accessToken);
+        assertTrue(response.ok(), "Delete user test failed: " + response.status() + " - " + response.text());
+
+        response = authenticate(testUsername, testPassword);
+        assertTrue(!response.ok(), "Delete user test failed - Able to authenticate: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void updateEmailTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        String newEmail = "new@email.com";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newEmail", newEmail);
+        requestBody.put("password", testPassword);
+
+        APIResponse response = updateEmail(requestBody, accessToken);
+        assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
+
+        response = searchUsers(testUsername, accessToken);
+        assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals(newEmail, jsonObject.get("email").getAsString());
+    }
+
+    @Test
+    public void updateUsernameTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+        testUsername = "newUsername";
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newUsername", testUsername);
+        requestBody.put("password", testPassword);
+
+        APIResponse response = updateUsername(requestBody, accessToken);
+        assertTrue(response.ok(), "Update username failed: " + response.status() + " - " + response.text());
+
+        // We have to re-fetch the accessToken since the user's username has changed
+        response = authenticate(testUsername, testPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+        response = serveAccessToken(extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+        accessToken = extractJwt(response);
+
+        response = searchUsers(testUsername, accessToken);
+        assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertEquals(testUsername, jsonObject.get("username").getAsString());
     }
 
     private String registerEnableAuthenticateAccess() {
@@ -328,6 +366,11 @@ public class AuthTest {
 
     private APIResponse updateEmail(Map<String, String> requestBody, String accessToken) {
         return apiRequestContext.post(BASE_URL + "/user/update-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse updateUsername(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/update-username", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
