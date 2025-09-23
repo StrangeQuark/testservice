@@ -45,7 +45,8 @@ public class AuthTest {
     public void afterEach(TestInfo testInfo) {
         // Skip teardown for healthcheckTest
         if (testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
-                testInfo.getTestMethod().get().getName().equals("deleteUserTest")) {
+                testInfo.getTestMethod().get().getName().equals("deleteUserTest")  ||
+                testInfo.getTestMethod().get().getName().equals("serviceAccountAuthenticationTest")) {
             return;
         }
 
@@ -167,7 +168,7 @@ public class AuthTest {
         assertTrue(response.ok(), "Disable user failed: " + response.status() + " - " + response.text());
 
         response = authenticate(testUsername, testPassword);
-        assertTrue(!response.ok(), "Disable user failed - User still enabled: " + response.status() + " - " + response.text());
+        assertFalse(response.ok(), "Disable user failed - User still enabled: " + response.status() + " - " + response.text());
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
         assertEquals("User is disabled", jsonObject.get("errorMessage").getAsString());
@@ -203,10 +204,10 @@ public class AuthTest {
         requestBody.put("authorizations", auths);
 
         APIResponse response = addAuthorizationsToUser(requestBody, accessToken);
-        assertTrue(!response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
+        assertFalse(response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
-        assertEquals("Only SUPER or ADMIN users can assign roles", jsonObject.get("errorMessage").getAsString());
+        assertEquals("Only SUPER or ADMIN users can add authorizations to users", jsonObject.get("errorMessage").getAsString());
     }
 
     @Test
@@ -231,7 +232,7 @@ public class AuthTest {
         assertTrue(response.ok(), "Delete user test failed: " + response.status() + " - " + response.text());
 
         response = authenticate(testUsername, testPassword);
-        assertTrue(!response.ok(), "Delete user test failed - Able to authenticate: " + response.status() + " - " + response.text());
+        assertFalse(response.ok(), "Delete user test failed - Able to authenticate: " + response.status() + " - " + response.text());
     }
 
     @Test
@@ -277,6 +278,50 @@ public class AuthTest {
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
         assertEquals(testUsername, jsonObject.get("username").getAsString());
+    }
+
+    @Test
+    public void updateRoleTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("newRole", "SUPER");
+        requestBody.put("username", testUsername);
+
+        APIResponse response = updateRole(requestBody, accessToken);
+        assertFalse(response.ok(), "Update role failed: " + response.status() + " - " + response.text());
+    }
+    // Integration function start: Email
+    @Test
+    public void sendPasswordResetEmailTest() {
+        String accessToken = registerEnableAuthenticateAccess();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", testEmail);
+
+        APIResponse response = sendPasswordResetEmail(requestBody, accessToken);
+        assertTrue(response.ok(), "Send password reset email failed: " + response.status() + " - " + response.text());
+    } // Integration function end: Email
+
+    @Test
+    public void bootstrapSuperUserTest() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", testUsername);
+        requestBody.put("email", testEmail);
+        requestBody.put("password", testPassword);
+
+        APIResponse response = bootstrapSuperUser(requestBody);
+        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void serviceAccountAuthenticationTest() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("clientId", "test");
+        requestBody.put("clientPassword", authUtility.getServiceSecretTest());
+
+        APIResponse response = serviceAccountAuthenticate(requestBody);
+        assertTrue(response.ok(), "Service account authentication failed: " + response.status() + " - " + response.text());
     }
 
     private String registerEnableAuthenticateAccess() {
@@ -372,6 +417,25 @@ public class AuthTest {
     private APIResponse updateUsername(Map<String, String> requestBody, String accessToken) {
         return apiRequestContext.post(BASE_URL + "/user/update-username", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse updateRole(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/update-role", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse sendPasswordResetEmail(Map<String, String> requestBody, String accessToken) {
+        return apiRequestContext.post(BASE_URL + "/user/send-password-reset-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    private APIResponse bootstrapSuperUser(Map<String, String> requestBody) {
+        return apiRequestContext.post(BASE_URL + "/internal/bootstrap", RequestOptions.create().setData(requestBody)
+                .setHeader("X-BOOTSTRAP-SECRET", authUtility.getAuthBootstrapSecretKey()));
+    }
+
+    private APIResponse serviceAccountAuthenticate(Map<String, String> requestBody) {
+        return apiRequestContext.post(BASE_URL + "/service-account/authenticate", RequestOptions.create().setData(requestBody));
     }
 
     private APIResponse addAuthorizationsToUser(Map<String, Object> requestBody, String accessToken) {
