@@ -70,7 +70,7 @@ public class AuthUtility {
         return AUTH_BOOTSTRAP_SECRET_KEY;
     }
 
-    public String getServiceSecretTest() {
+    public String getServiceSecretTest(String clientId) {
         return SERVICE_SECRET_TEST;
     }
 }
