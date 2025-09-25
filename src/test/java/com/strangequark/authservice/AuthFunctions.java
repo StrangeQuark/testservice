@@ -1,3 +1,5 @@
+// Integration file: Auth
+
 package com.strangequark.authservice;
 
 import com.google.gson.JsonObject;
@@ -14,14 +16,14 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthFunctions {
-    private static final String AUTH_BASE_URL = "http://localhost:6001/api/auth";
+    public static final String AUTH_BASE_URL = "http://localhost:6001/api/auth";
 
     private final APIRequestContext apiRequestContext;
     private final AuthUtility authUtility;
 
     public AuthFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;
-        this.authUtility = new AuthUtility();
+        this.authUtility = new AuthUtility(apiRequestContext);
     }
 
     public APIResponse healthcheck() {

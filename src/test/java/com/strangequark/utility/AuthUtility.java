@@ -2,24 +2,20 @@ package com.strangequark.utility;
 
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
-import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.RequestOptions;
+import com.strangequark.authservice.AuthFunctions;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AuthUtility {
-    private Playwright playwright;
-    private APIRequestContext apiRequestContext;
+    private final APIRequestContext apiRequestContext;
     private final String SERVICE_SECRET_TEST;
     private final String AUTH_BOOTSTRAP_SECRET_KEY;
 
-    private final String BASE_URL = "http://localhost:6001/api/auth";
-
-    public AuthUtility() {
-        playwright = Playwright.create();
-        apiRequestContext = playwright.request().newContext();
+    public AuthUtility(APIRequestContext apiRequestContext) {
+        this.apiRequestContext = apiRequestContext;
 
         // Attempt to get the TestService service secret for auth integrations
         String serviceSecret = System.getenv("SERVICE_SECRET_TEST");
@@ -51,7 +47,7 @@ public class AuthUtility {
             requestBody.put("clientId", "test");
             requestBody.put("clientPassword", SERVICE_SECRET_TEST);
 
-            APIResponse response = apiRequestContext.post(BASE_URL + "/service-account/authenticate",
+            APIResponse response = apiRequestContext.post(AuthFunctions.AUTH_BASE_URL + "/service-account/authenticate",
                     RequestOptions.create().setData(requestBody));
 
             String res = response.text().replace("\"", "");

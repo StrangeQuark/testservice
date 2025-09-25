@@ -1,3 +1,5 @@
+// Integration file: Auth
+
 package com.strangequark.authservice;
 
 import com.google.gson.JsonObject;
@@ -14,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AuthTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
-
     private static AuthFunctions authFunctions;
+
     private String testUsername;
     private String testEmail;
     private String testPassword;
