@@ -32,7 +32,7 @@ public class EmailFunctions {
     }
     // Integration function start: Auth
     public EmailFunctions(APIRequestContext apiRequestContext, AuthFunctions authFunctions) {
-        this.apiRequestContext = apiRequestContext;
+        this(apiRequestContext);
         this.authFunctions = authFunctions;
         this.authUtility = new AuthUtility(apiRequestContext); // Integration line: Auth
     } // Integration function end: Auth
