@@ -2,8 +2,14 @@ package com.strangequark.fileservice;
 
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.options.FormData;
+import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.AuthUtility;
+
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileFunctions {
     APIRequestContext apiRequestContext;
@@ -28,5 +34,24 @@ public class FileFunctions {
 
     public APIResponse healthcheck() {
         return apiRequestContext.get(FILE_BASE_URL + "/health");
+    }
+
+    public APIResponse createCollection(String testCollectionName) {
+        return apiRequestContext.post(FILE_BASE_URL + "/new-collection/" + testCollectionName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse upload(String testCollectionName) {
+        try {
+            Path filePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/testUploadFile.txt").toURI());
+            FormData formData = FormData.create().set("file", filePath);
+
+            return apiRequestContext.post(FILE_BASE_URL + "/upload/" + testCollectionName, RequestOptions.create().setMultipart(formData)
+                    .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+            );
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException("Failed to load test file from resources", ex);
+        }
     }
 }

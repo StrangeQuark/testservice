@@ -60,7 +60,7 @@ public class AuthTests {
     @Test
     public void healthcheckTest() {
         APIResponse response = authFunctions.healthcheck();
-        assertTrue(response.ok(), "Healthcheck failed: " + response.status() + " - " + response.text());
+        assertTrue(response.ok(), "Auth service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
     @Test

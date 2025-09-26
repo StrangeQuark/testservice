@@ -29,7 +29,7 @@ public class EmailTests {
     @Test
     public void healthcheckTest() {
         APIResponse response = emailFunctions.healthcheck();
-        assertTrue(response.ok(), "Healthcheck failed: " + response.status() + " - " + response.text());
+        assertTrue(response.ok(), "Email service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EmailTests {
     @Test
     public void confirmTokenTest() {
         APIResponse response = emailFunctions.confirmToken();
-        assertTrue(response.ok(), "Confirm Email token test failed: " + response.status() + " - " + response.text());
+        assertTrue(response.ok(), "Confirm email token test failed: " + response.status() + " - " + response.text());
     }
     // Integration function start: Auth
     @Test
