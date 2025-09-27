@@ -42,9 +42,21 @@ public class FileFunctions {
         );
     }
 
-    public APIResponse upload(String testCollectionName) {
+    public APIResponse getAllCollections() {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-all-collections", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse deleteCollection(String testCollectionName) {
+        return apiRequestContext.delete(FILE_BASE_URL + "/delete-collection/" + testCollectionName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse upload(String testCollectionName, String uploadFileName) {
         try {
-            Path filePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/testUploadFile.txt").toURI());
+            Path filePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + uploadFileName).toURI());
             FormData formData = FormData.create().set("file", filePath);
 
             return apiRequestContext.post(FILE_BASE_URL + "/upload/" + testCollectionName, RequestOptions.create().setMultipart(formData)
@@ -53,5 +65,29 @@ public class FileFunctions {
         } catch (URISyntaxException ex) {
             throw new RuntimeException("Failed to load test file from resources", ex);
         }
+    }
+
+    public APIResponse delete(String testCollectionName) {
+        return apiRequestContext.delete(FILE_BASE_URL + "/delete/" + testCollectionName + "/testUploadFile.txt", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse getAllFiles(String testCollectionName) {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-all/" + testCollectionName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse downloadFile(String testCollectionName, String fileName) {
+        return apiRequestContext.get(FILE_BASE_URL + "/download/" + testCollectionName + "/" + fileName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse streamFile(String testCollectionName, String fileName) {
+        return apiRequestContext.get(FILE_BASE_URL + "/stream/" + testCollectionName + "/" + fileName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
     }
 }
