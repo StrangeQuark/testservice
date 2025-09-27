@@ -76,7 +76,7 @@ public class AuthTests {
 
         response = authFunctions.enableUser(testEmail);
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
-    }// Integration function start: end
+    }// Integration function end: Email
 
     @Test
     public void authenticateTest() {
