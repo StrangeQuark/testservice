@@ -190,7 +190,7 @@ public class AuthFunctions {
     }
 
     public String extractJwt(APIResponse response) {
-        if (response.ok()) {
+        if(response.ok()) {
             JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
             return jsonObject.get("jwtToken").getAsString();
         } else {

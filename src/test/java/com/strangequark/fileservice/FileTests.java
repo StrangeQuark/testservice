@@ -41,25 +41,25 @@ public class FileTests {
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
+        if(testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
                 testInfo.getTestMethod().get().getName().equals("createCollectionTest")) {
             return;
         }
         testCollectionName = "testCollection_" + UUID.randomUUID();
 
         APIResponse response = fileFunctions.createCollection(testCollectionName);
-        assertTrue(response.ok(), "Create collection test failed: " + response.status() + " - " + response.text());
+        assertTrue(response.ok(), "Create collection setup failed: " + response.status() + " - " + response.text());
     }
 
     @AfterEach
     public void afterEach(TestInfo testInfo) {
-        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
+        if(testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
                 testInfo.getTestMethod().get().getName().equals("deleteCollectionTest")) {
             return;
         }
 
         APIResponse response = fileFunctions.deleteCollection(testCollectionName);
-        if (!response.ok()) {
+        if(!response.ok()) {
             System.err.println("Cleanup failed for " + testCollectionName + ": " + response.status() + " - " + response.text());
         }
     }
