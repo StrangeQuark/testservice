@@ -31,7 +31,7 @@ public class AuthTests {
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest")) {
+        if(testInfo.getTestMethod().get().getName().equals("healthcheckTest")) {
             return;
         }
 
@@ -42,7 +42,7 @@ public class AuthTests {
 
     @AfterEach
     public void afterEach(TestInfo testInfo) {
-        if (testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
+        if(testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
                 testInfo.getTestMethod().get().getName().equals("deleteUserTest")  ||
                 testInfo.getTestMethod().get().getName().equals("serviceAccountAuthenticationTest")) {
             return;
@@ -52,7 +52,7 @@ public class AuthTests {
         APIResponse response = authFunctions.authenticate(testUsername, testPassword);
         response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
         response = authFunctions.deleteUser(testUsername, testPassword, authFunctions.extractJwt(response));
-        if (!response.ok()) {
+        if(!response.ok()) {
             System.err.println("Cleanup failed for " + testUsername + ": " + response.status() + " - " + response.text());
         }
     }
