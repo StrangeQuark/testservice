@@ -155,4 +155,140 @@ public class FileTests {
             throw new RuntimeException("Failed to load test file from resources", ex);
         }
     }
+    // Integration function start: Auth
+    @Test
+    public void getCurrentUserRoleTest() {
+        APIResponse response = fileFunctions.getCurrentUserRole(testCollectionName);
+        assertTrue(response.ok(), "Get current user role test failed: " + response.status() + " - " + response.text());
+        assertEquals("OWNER", response.text().replace("\"", ""));
+    }
+
+    @Test
+    public void getUsersByCollectionTest() {
+        APIResponse response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Get users by collection test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(1, jsonArray.size(), "Get users by collection return size test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void getAllRolesTest() {
+        APIResponse response = fileFunctions.getAllRoles();
+        assertTrue(response.ok(), "Get all roles test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(4, jsonArray.size(), "Get all roles return size test failed: " + response.status() + " - " + response.text());
+
+        String returnString = jsonArray.toString();
+        assertTrue(returnString.contains("OWNER"), "File service should contain OWNER role");
+        assertTrue(returnString.contains("MANAGER"), "File service should contain MANAGER role");
+        assertTrue(returnString.contains("READ_WRITE"), "File service should contain READ_WRITE role");
+        assertTrue(returnString.contains("READ"), "File service should contain READ role");
+    }
+
+    @Test
+    public void addUserToCollectionTest() {
+        fileFunctions.testUsername = "test_" + UUID.randomUUID();
+        fileFunctions.testEmail = fileFunctions.testUsername + "@email.com";
+        fileFunctions.testPassword = UUID.randomUUID().toString();
+
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
+
+        APIResponse response = fileFunctions.addUserToCollection(testCollectionName);
+        assertTrue(response.ok(), "Add user to collection test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Get users by collection in add user to collection test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(2, jsonArray.size(), "Add user to collection return size test failed: " + response.status() + " - " + response.text());
+
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword, accessToken);
+        assertTrue(response.ok(), "Delete user in add user to collection test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void updateUserRoleTest() {
+        fileFunctions.testUsername = "test_" + UUID.randomUUID();
+        fileFunctions.testEmail = fileFunctions.testUsername + "@email.com";
+        fileFunctions.testPassword = UUID.randomUUID().toString();
+
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
+
+        APIResponse response = fileFunctions.addUserToCollection(testCollectionName);
+        assertTrue(response.ok(), "Add user to collection in update user role test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.updateUserRole(testCollectionName, "MANAGER");
+        assertTrue(response.ok(), "Update user role test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Get users by collection in update user role test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertTrue(jsonArray.toString().contains("MANAGER"), "Users list should contain newly update MANAGER role in update user role test");
+
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword, accessToken);
+        assertTrue(response.ok(), "Delete user in update user role test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void deleteUserFromCollectionTest() {
+        fileFunctions.testUsername = "test_" + UUID.randomUUID();
+        fileFunctions.testEmail = fileFunctions.testUsername + "@email.com";
+        fileFunctions.testPassword = UUID.randomUUID().toString();
+
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
+
+        APIResponse response = fileFunctions.addUserToCollection(testCollectionName);
+        assertTrue(response.ok(), "Add user to collection in delete user from collection test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Get users by collection in delete user from collection test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(2, jsonArray.size(), "Add user to collection in delete user from collection return size test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.deleteUserFromCollection(testCollectionName);
+        assertTrue(response.ok(), "Delete user from collection test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Second get users by collection in delete user from collection test failed: " + response.status() + " - " + response.text());
+
+        jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(1, jsonArray.size(), "Delete user from collection return size test failed: " + response.status() + " - " + response.text());
+
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword, accessToken);
+        assertTrue(response.ok(), "Delete user in delete user from collection test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void deleteUserFromAllCollectionsTest() {
+        fileFunctions.testUsername = "test_" + UUID.randomUUID();
+        fileFunctions.testEmail = fileFunctions.testUsername + "@email.com";
+        fileFunctions.testPassword = UUID.randomUUID().toString();
+
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
+
+        APIResponse response = fileFunctions.addUserToCollection(testCollectionName);
+        assertTrue(response.ok(), "Add user to collection in delete user from all collections test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Get users by collection in delete user from all collections test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(2, jsonArray.size(), "Add user to collection in delete user from all collections return size test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.deleteUserFromAllCollections();
+        assertTrue(response.ok(), "Delete user from all collections test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getUsersByCollection(testCollectionName);
+        assertTrue(response.ok(), "Second get users by collection in delete user from all collections test failed: " + response.status() + " - " + response.text());
+
+        jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(1, jsonArray.size(), "Delete user from all collections return size test failed: " + response.status() + " - " + response.text());
+
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword, accessToken);
+        assertTrue(response.ok(), "Delete user in delete user from all collections test failed: " + response.status() + " - " + response.text());
+    } // Integration function end: Auth
 }
