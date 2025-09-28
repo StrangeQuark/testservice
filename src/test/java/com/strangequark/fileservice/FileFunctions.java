@@ -12,6 +12,8 @@ import com.strangequark.utility.AuthUtility;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileFunctions {
     APIRequestContext apiRequestContext;
@@ -92,4 +94,63 @@ public class FileFunctions {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
+    // Integration function start: Auth
+    public APIResponse getCurrentUserRole(String testCollectionName) {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-current-user-role/" + testCollectionName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse getUsersByCollection(String testCollectionName) {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-users-by-collection/" + testCollectionName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse getAllRoles() {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-all-roles", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse addUserToCollection(String testCollectionName) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("collectionName", testCollectionName);
+        requestBody.put("username", testUsername);
+        requestBody.put("role", "READ_WRITE");
+
+        return apiRequestContext.post(FILE_BASE_URL + "/add-user-to-collection", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse updateUserRole(String testCollectionName, String newRole) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("collectionName", testCollectionName);
+        requestBody.put("username", testUsername);
+        requestBody.put("role", newRole);
+
+        return apiRequestContext.post(FILE_BASE_URL + "/update-user-role", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse deleteUserFromCollection(String testCollectionName) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("collectionName", testCollectionName);
+        requestBody.put("username", testUsername);
+
+        return apiRequestContext.post(FILE_BASE_URL + "/delete-user-from-collection", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse deleteUserFromAllCollections() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", testUsername);
+
+        return apiRequestContext.post(FILE_BASE_URL + "/delete-user-from-all-collections", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }// Integration function end: Auth
 }
