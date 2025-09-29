@@ -111,7 +111,7 @@ public class EmailFunctions {
         requestBody.put("sender", "sender@email.com");
         requestBody.put("subject", "Test subject");
 
-        response =  apiRequestContext.post(EmailFunctions.EMAIL_BASE_URL + "/send-register-email", RequestOptions.create().setData(requestBody)
+        response = apiRequestContext.post(EmailFunctions.EMAIL_BASE_URL + "/send-register-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
         assertTrue(response.ok(), "Send register email test failed: " + response.status() + " - " + response.text());
 

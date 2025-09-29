@@ -49,9 +49,7 @@ public class AuthTests {
         }
 
         authFunctions.enableUser(testEmail);// Integration line: Email
-        APIResponse response = authFunctions.authenticate(testUsername, testPassword);
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
-        response = authFunctions.deleteUser(testUsername, testPassword, authFunctions.extractJwt(response));
+        APIResponse response = authFunctions.deleteUser(testUsername, testPassword);
         if(!response.ok()) {
             System.err.println("Cleanup failed for " + testUsername + ": " + response.status() + " - " + response.text());
         }
@@ -218,9 +216,9 @@ public class AuthTests {
 
     @Test
     public void deleteUserTest() {
-        String accessToken = authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
+        authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
 
-        APIResponse response = authFunctions.deleteUser(testUsername, testPassword, accessToken);
+        APIResponse response = authFunctions.deleteUser(testUsername, testPassword);
         assertTrue(response.ok(), "Delete user test failed: " + response.status() + " - " + response.text());
 
         response = authFunctions.authenticate(testUsername, testPassword);
