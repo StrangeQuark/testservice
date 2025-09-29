@@ -309,7 +309,7 @@ public class VaultTests {
         vaultFunctions.testEmail = vaultFunctions.testUsername + "@email.com";
         vaultFunctions.testPassword = UUID.randomUUID().toString();
 
-        String accessToken = authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
+        authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
 
         APIResponse response = vaultFunctions.addUserToService(testServiceName);
         assertTrue(response.ok(), "Add user to service in update user role test failed: " + response.status() + " - " + response.text());
@@ -323,7 +323,7 @@ public class VaultTests {
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertTrue(jsonArray.toString().contains("MANAGER"), "Users list should contain newly update MANAGER role in update user role test");
 
-        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword, accessToken);
+        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in update user role test failed: " + response.status() + " - " + response.text());
     }
 
@@ -333,7 +333,7 @@ public class VaultTests {
         vaultFunctions.testEmail = vaultFunctions.testUsername + "@email.com";
         vaultFunctions.testPassword = UUID.randomUUID().toString();
 
-        String accessToken = authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
+        authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
 
         APIResponse response = vaultFunctions.addUserToService(testServiceName);
         assertTrue(response.ok(), "Add user to service test failed: " + response.status() + " - " + response.text());
@@ -344,7 +344,7 @@ public class VaultTests {
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(2, jsonArray.size(), "Add user to service return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword, accessToken);
+        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in add user to service test failed: " + response.status() + " - " + response.text());
     }
 
@@ -354,7 +354,7 @@ public class VaultTests {
         vaultFunctions.testEmail = vaultFunctions.testUsername + "@email.com";
         vaultFunctions.testPassword = UUID.randomUUID().toString();
 
-        String accessToken = authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
+        authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
 
         APIResponse response = vaultFunctions.addUserToService(testServiceName);
         assertTrue(response.ok(), "Add user to service in delete user from service test failed: " + response.status() + " - " + response.text());
@@ -374,7 +374,7 @@ public class VaultTests {
         jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Delete user from service return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword, accessToken);
+        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from service test failed: " + response.status() + " - " + response.text());
     }
 
@@ -384,7 +384,7 @@ public class VaultTests {
         vaultFunctions.testEmail = vaultFunctions.testUsername + "@email.com";
         vaultFunctions.testPassword = UUID.randomUUID().toString();
 
-        String accessToken = authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
+        authFunctions.registerEnableAuthenticateAccess(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
 
         APIResponse response = vaultFunctions.addUserToService(testServiceName);
         assertTrue(response.ok(), "Add user to service in delete user from all services test failed: " + response.status() + " - " + response.text());
@@ -404,7 +404,7 @@ public class VaultTests {
         jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Delete user from all services return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword, accessToken);
+        authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from all services test failed: " + response.status() + " - " + response.text());
     } // Integration function end: Auth
 }

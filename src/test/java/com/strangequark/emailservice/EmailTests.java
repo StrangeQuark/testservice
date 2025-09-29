@@ -71,10 +71,7 @@ public class EmailTests {
         assertTrue(response.ok(), "Email enable user test failed: " + response.status() + " - " + response.text());
 
         // Cleanup the user that was created
-        authFunctions.enableUser(emailFunctions.testEmail);
-        response = authFunctions.authenticate(emailFunctions.testUsername, emailFunctions.testPassword);
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
-        response = authFunctions.deleteUser(emailFunctions.testUsername, emailFunctions.testPassword, authFunctions.extractJwt(response));
+        response = authFunctions.deleteUser(emailFunctions.testUsername, emailFunctions.testPassword);
         assertTrue(response.ok(), "Email enable user test cleanup failed: " + response.status() + " - " + response.text());
     }// Integration function end: Auth
 }

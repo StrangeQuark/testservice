@@ -4,12 +4,15 @@ package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.strangequark.authservice.AuthFunctions;
+import com.strangequark.utility.AuthUtility;
 import org.junit.jupiter.api.*;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -18,17 +21,29 @@ public class ReactTests {
     private Page page;
     private Browser browser;
     private ReactFunctions reactFunctions;
+    private static APIRequestContext apiRequestContext; // Integration function start: Auth
+    private AuthFunctions authFunctions;
+    private AuthUtility authUtility; // Integration function end: Auth
 
     @BeforeAll
     public void beforeAll() {
         playwright = Playwright.create();
         reactFunctions = new ReactFunctions();
+        apiRequestContext = playwright.request().newContext(); // Integration function start: Auth
+        authFunctions = new AuthFunctions(apiRequestContext);
+        authUtility = new AuthUtility(apiRequestContext); // Integration function end: Auth
     }
 
     @BeforeEach
     public void beforeEach() {
         browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false));
         page = browser.newPage();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        browser.close();
+        page.close();
     }
     // Integration function start: Auth
     @Test
@@ -64,11 +79,10 @@ public class ReactTests {
 
         requestSuccessTextField.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         assertTrue(requestSuccessTextField.isVisible(), "Login div should be visible after clicking loginButton");
-    }// Integration function end: Auth
 
-    @AfterEach
-    public void afterEach() {
-        browser.close();
-        page.close();
-    }
+        // Cleanup and ensure user was deleted
+        authFunctions.enableUser(email);
+        authFunctions.deleteUser(username, password);
+        assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+    }// Integration function end: Auth
 }
