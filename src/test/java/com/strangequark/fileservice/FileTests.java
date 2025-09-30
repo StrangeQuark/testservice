@@ -204,7 +204,7 @@ public class FileTests {
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(2, jsonArray.size(), "Add user to collection return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword);
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in add user to collection test failed: " + response.status() + " - " + response.text());
     }
 
@@ -228,7 +228,7 @@ public class FileTests {
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertTrue(jsonArray.toString().contains("MANAGER"), "Users list should contain newly update MANAGER role in update user role test");
 
-        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword);
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in update user role test failed: " + response.status() + " - " + response.text());
     }
 
@@ -258,7 +258,7 @@ public class FileTests {
         jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Delete user from collection return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword);
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from collection test failed: " + response.status() + " - " + response.text());
     }
 
@@ -288,7 +288,7 @@ public class FileTests {
         jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Delete user from all collections return size test failed: " + response.status() + " - " + response.text());
 
-        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testPassword);
+        authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from all collections test failed: " + response.status() + " - " + response.text());
     } // Integration function end: Auth
 }

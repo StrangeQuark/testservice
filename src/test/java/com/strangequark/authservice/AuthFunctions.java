@@ -84,11 +84,12 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    public APIResponse deleteUser(String username, String password) {
+    public APIResponse deleteUser(String username, String email, String password) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("password", password);
 
+        enableUser(email);
         String refreshToken = extractJwt(authenticate(username, password));
         String accessToken = extractJwt(serveAccessToken(refreshToken));
 

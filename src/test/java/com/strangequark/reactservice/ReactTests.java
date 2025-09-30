@@ -81,8 +81,7 @@ public class ReactTests {
         assertTrue(requestSuccessTextField.isVisible(), "Login div should be visible after clicking loginButton");
 
         // Cleanup and ensure user was deleted
-        authFunctions.enableUser(email);
-        authFunctions.deleteUser(username, password);
+        authFunctions.deleteUser(username, email, password);
         assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
     }// Integration function end: Auth
 }
