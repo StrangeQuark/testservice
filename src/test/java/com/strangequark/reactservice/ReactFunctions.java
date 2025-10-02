@@ -6,7 +6,7 @@ public class ReactFunctions {
     public ReactFunctions() {
 
     }
-
+    // Integration function start: Auth
     public void navigateToLogin(Page page) {
         page.navigate("localhost:6080");
         page.click("id=loginButton");
@@ -25,5 +25,9 @@ public class ReactFunctions {
         page.locator("id=confirm-password").fill(password);
 
         page.click("id=submit-button");
-    }
+    }// Integration function end: Auth
+    // Integration function start: Email
+    public void navigateToMailbox(Page page) {
+        page.navigate("localhost:1080");
+    }// Integration function end: Email
 }

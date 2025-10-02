@@ -83,5 +83,30 @@ public class ReactTests {
         // Cleanup and ensure user was deleted
         authFunctions.deleteUser(username, email, password);
         assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
-    }// Integration function end: Auth
+    }
+    // Integration function start: Email
+    @Test
+    public void ensureRegisterEmailSent() {
+        String username = "test_" + UUID.randomUUID();
+        String email = username + "@testEmail.com";
+        String password = "testPassword123!";
+
+        reactFunctions.navigateToRegister(page);
+        reactFunctions.fillRegisterForm(page, username, email, password);
+
+        // We must wait for the success div otherwise we sometimes navigateToMailbox too quickly and don't send the requests
+        page.locator("id=request-success-text-field")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+
+        reactFunctions.navigateToMailbox(page);
+
+        page.getByText(email).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        assertTrue(page.getByText(email).isVisible());
+
+        // Cleanup and ensure user was deleted
+        authFunctions.deleteUser(username, email, password);
+        assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+    }
+    // Integration function end: Email
+    // Integration function end: Auth
 }
