@@ -28,6 +28,10 @@ public class ReactFunctions {
         page.navigate("localhost:6080/password-reset");
     }
 
+    public void navigateToNewPassword(Page page) {
+        page.navigate("localhost:6080/new-password");
+    }
+
     public void navigateToMailbox(Page page) {
         page.navigate("localhost:1080");
     }// Integration function end: Email

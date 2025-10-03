@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -96,7 +96,17 @@ public class ReactTests {
     }
 
     @Test
-    public void ensureRegisterEmailSent() {
+    public void ensureNewPasswordDivLoading() {
+        reactFunctions.navigateToNewPassword(page);
+
+        Locator newPasswordDiv = page.locator("id=request-div");
+
+        newPasswordDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        assertTrue(newPasswordDiv.isVisible(), "New password div should be visible after navigating to new-password page");
+    }
+
+    @Test
+    public void ensureRegisterEmailWorks() {
         String username = "test_" + UUID.randomUUID();
         String email = username + "@testEmail.com";
         String password = "testPassword123!";
@@ -109,9 +119,20 @@ public class ReactTests {
                 .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
 
         reactFunctions.navigateToMailbox(page);
+        page.getByText(email).click();
 
-        page.getByText(email).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        assertTrue(page.getByText(email).isVisible());
+        FrameLocator emailFrame = page.frameLocator("iframe").first();
+
+        Locator confirmLink = emailFrame.getByText("confirm-email?token=");
+        confirmLink.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+
+        String confirmUrl = confirmLink.getAttribute("href");
+        assertNotNull(confirmUrl, "Confirmation link should have an href attribute");
+
+        page.navigate(confirmUrl);
+        Locator successMessageDiv = page.locator("id=message-div");
+        successMessageDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        assertTrue(successMessageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
 
         // Cleanup and ensure user was deleted
         authFunctions.deleteUser(username, email, password);
