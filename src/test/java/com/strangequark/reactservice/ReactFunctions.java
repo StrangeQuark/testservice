@@ -8,14 +8,11 @@ public class ReactFunctions {
     }
     // Integration function start: Auth
     public void navigateToLogin(Page page) {
-        page.navigate("localhost:6080");
-        page.click("id=loginButton");
+        page.navigate("localhost:6080/login");
     }
 
     public void navigateToRegister(Page page) {
-        navigateToLogin(page);
-
-        page.click("id=sign-up-link");
+        page.navigate("localhost:6080/register");
     }
 
     public void fillRegisterForm(Page page, String username, String email, String password) {
@@ -27,6 +24,10 @@ public class ReactFunctions {
         page.click("id=submit-button");
     }// Integration function end: Auth
     // Integration function start: Email
+    public void navigateToPasswordReset(Page page) {
+        page.navigate("localhost:6080/password-reset");
+    }
+
     public void navigateToMailbox(Page page) {
         page.navigate("localhost:1080");
     }// Integration function end: Email

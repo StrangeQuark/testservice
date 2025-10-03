@@ -53,7 +53,7 @@ public class ReactTests {
         Locator loginDiv = page.locator("id=login-div");
 
         loginDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        assertTrue(loginDiv.isVisible(), "Login div should be visible after clicking loginButton");
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ReactTests {
         Locator registerDiv = page.locator("id=register-div");
 
         registerDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        assertTrue(registerDiv.isVisible(), "Login div should be visible after clicking loginButton");
+        assertTrue(registerDiv.isVisible(), "Register div should be visible after navigating to register page");
     }
 
     @Test
@@ -78,13 +78,23 @@ public class ReactTests {
         Locator requestSuccessTextField = page.locator("id=request-success-text-field");
 
         requestSuccessTextField.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        assertTrue(requestSuccessTextField.isVisible(), "Login div should be visible after clicking loginButton");
+        assertTrue(requestSuccessTextField.isVisible(), "Request success div should be visible after navigating to register page");
 
         // Cleanup and ensure user was deleted
         authFunctions.deleteUser(username, email, password);
         assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
     }
     // Integration function start: Email
+    @Test
+    public void ensurePasswordResetDivLoading() {
+        reactFunctions.navigateToPasswordReset(page);
+
+        Locator resetPasswordDiv = page.locator("id=request-div");
+
+        resetPasswordDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        assertTrue(resetPasswordDiv.isVisible(), "Reset password div should be visible after navigating to password-reset page");
+    }
+
     @Test
     public void ensureRegisterEmailSent() {
         String username = "test_" + UUID.randomUUID();
