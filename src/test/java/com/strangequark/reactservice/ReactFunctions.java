@@ -6,11 +6,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactFunctions {
     public ReactFunctions() {
 
+    }
+    public void navigateToHomePage(Page page) {
+        page.navigate("localhost:6080/");
     }
     // Integration function start: Auth
     public void navigateToLogin(Page page) {
