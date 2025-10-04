@@ -68,7 +68,8 @@ public class ReactFunctions {
         navigateToLogin(page);
 
         fillAndSubmitLoginForm(page, username, password);
-    }// Integration function end: Auth
+    }
+    // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
         page.navigate("localhost:6080/password-reset");
@@ -81,8 +82,15 @@ public class ReactFunctions {
     public void navigateToMailbox(Page page) {
         page.navigate("localhost:1080");
     }
-
-    public void enableUserViaEmail(Page page) {
-
-    }// Integration function end: Email
+    // Integration function end: Email
+    // Integration function start: File
+    public void clickToolbarFilesButton(Page page) {
+        page.getByText("Files").click();
+    }
+    // Integration function end: File
+    // Integration function start: Vault
+    public void clickToolbarVaultButton(Page page) {
+        page.getByText("Vault").click();
+    }
+    // Integration function end: Vault
 }

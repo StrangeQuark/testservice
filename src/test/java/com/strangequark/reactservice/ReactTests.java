@@ -142,5 +142,31 @@ public class ReactTests {
         assertTrue(messageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
     }
     // Integration function end: Email
+    // Integration function start: File
+    @Test
+    public void ensureToolbarFilesButtonRedirectsToLogin() {
+        reactFunctions.navigateToLogin(page);
+
+        reactFunctions.clickToolbarFilesButton(page);
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
+    }
+    // Integration function end: File
+    // Integration function start: Vault
+    @Test
+    public void ensureToolbarVaultButtonRedirectsToLogin() {
+        reactFunctions.navigateToLogin(page);
+
+        reactFunctions.clickToolbarVaultButton(page);
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
+    }
+    // Integration function end: Vault
     // Integration function end: Auth
 }
