@@ -1,6 +1,12 @@
 package com.strangequark.reactservice;
 
+import com.microsoft.playwright.FrameLocator;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.WaitForSelectorState;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactFunctions {
     public ReactFunctions() {
@@ -15,13 +21,51 @@ public class ReactFunctions {
         page.navigate("localhost:6080/register");
     }
 
-    public void fillRegisterForm(Page page, String username, String email, String password) {
+    public void fillAndSubmitRegisterForm(Page page, String username, String email, String password) {
         page.locator("id=username").fill(username);
         page.locator("id=email").fill(email);
         page.locator("id=password").fill(password);
         page.locator("id=confirm-password").fill(password);
 
         page.click("id=submit-button");
+    }
+
+    public void fillAndSubmitLoginForm(Page page, String username, String password) {
+        page.locator("id=username").fill(username);
+        page.locator("id=password").fill(password);
+
+        page.click("id=submit-button");
+    }
+
+    public void registerAndEnable(Page page, String username, String email, String password) {
+        navigateToRegister(page);
+        fillAndSubmitRegisterForm(page, username, email, password);
+        // We must wait for the success div otherwise we sometimes navigateToMailbox too quickly and don't send the requests
+        page.locator("id=request-success-text-field")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        // Integration function start: Email
+        navigateToMailbox(page);
+        page.getByText(email).click();
+
+        FrameLocator emailFrame = page.frameLocator("iframe").first();
+
+        Locator confirmLink = emailFrame.getByText("confirm-email?token=");
+        confirmLink.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+
+        String confirmUrl = confirmLink.getAttribute("href");
+        assertNotNull(confirmUrl, "Confirmation link should have an href attribute");
+
+        page.navigate(confirmUrl);
+        page.locator("id=message-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        // Integration function end: Email
+    }
+
+    public void registerEnableAndLogin(Page page, String username, String email, String password) {
+        registerAndEnable(page, username, email, password);
+
+        navigateToLogin(page);
+
+        fillAndSubmitLoginForm(page, username, password);
     }// Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
@@ -34,5 +78,9 @@ public class ReactFunctions {
 
     public void navigateToMailbox(Page page) {
         page.navigate("localhost:1080");
+    }
+
+    public void enableUserViaEmail(Page page) {
+
     }// Integration function end: Email
 }

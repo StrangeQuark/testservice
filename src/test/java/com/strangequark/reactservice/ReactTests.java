@@ -23,7 +23,11 @@ public class ReactTests {
     private ReactFunctions reactFunctions;
     private static APIRequestContext apiRequestContext; // Integration function start: Auth
     private AuthFunctions authFunctions;
-    private AuthUtility authUtility; // Integration function end: Auth
+    private AuthUtility authUtility;
+
+    String username;
+    String email;
+    String password;// Integration function end: Auth
 
     @BeforeAll
     public void beforeAll() {
@@ -35,15 +39,26 @@ public class ReactTests {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach(TestInfo testInfo) {
         browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false));
         page = browser.newPage();
+        // Integration function start: Auth
+        if(testInfo.getTestMethod().get().getName().startsWith("user")) {
+            username = "test_" + UUID.randomUUID();
+            email = username + "@testEmail.com";
+            password = "testPassword123!";
+        }// Integration function end: Auth
     }
 
     @AfterEach
-    public void afterEach() {
+    public void afterEach(TestInfo testInfo) {
         browser.close();
         page.close();
+        // Integration function start: Auth
+        if(testInfo.getTestMethod().get().getName().startsWith("user")) {
+            authFunctions.deleteUser(username, email, password);
+            assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+        }// Integration function end: Auth
     }
     // Integration function start: Auth
     @Test
@@ -67,22 +82,24 @@ public class ReactTests {
     }
 
     @Test
-    public void registerTest() {
-        String username = "test_" + UUID.randomUUID();
-        String email = username + "@testEmail.com";
-        String password = "testPassword123!";
-
+    public void userRegisterTest() {
         reactFunctions.navigateToRegister(page);
-        reactFunctions.fillRegisterForm(page, username, email, password);
+        reactFunctions.fillAndSubmitRegisterForm(page, username, email, password);
 
         Locator requestSuccessTextField = page.locator("id=request-success-text-field");
 
         requestSuccessTextField.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         assertTrue(requestSuccessTextField.isVisible(), "Request success div should be visible after navigating to register page");
+    }
 
-        // Cleanup and ensure user was deleted
-        authFunctions.deleteUser(username, email, password);
-        assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+    @Test
+    public void userLoginTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        Locator usernameButton = page.getByText(username);
+
+        usernameButton.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        assertTrue(usernameButton.isVisible(), "The logged in user's button should be visible after logging in");
     }
     // Integration function start: Email
     @Test
@@ -106,37 +123,10 @@ public class ReactTests {
     }
 
     @Test
-    public void ensureRegisterEmailWorks() {
-        String username = "test_" + UUID.randomUUID();
-        String email = username + "@testEmail.com";
-        String password = "testPassword123!";
+    public void userRegisterEmailTest() {
+        reactFunctions.registerAndEnable(page, username, email, password);
 
-        reactFunctions.navigateToRegister(page);
-        reactFunctions.fillRegisterForm(page, username, email, password);
-
-        // We must wait for the success div otherwise we sometimes navigateToMailbox too quickly and don't send the requests
-        page.locator("id=request-success-text-field")
-                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-
-        reactFunctions.navigateToMailbox(page);
-        page.getByText(email).click();
-
-        FrameLocator emailFrame = page.frameLocator("iframe").first();
-
-        Locator confirmLink = emailFrame.getByText("confirm-email?token=");
-        confirmLink.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-
-        String confirmUrl = confirmLink.getAttribute("href");
-        assertNotNull(confirmUrl, "Confirmation link should have an href attribute");
-
-        page.navigate(confirmUrl);
-        Locator successMessageDiv = page.locator("id=message-div");
-        successMessageDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        assertTrue(successMessageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
-
-        // Cleanup and ensure user was deleted
-        authFunctions.deleteUser(username, email, password);
-        assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+        assertTrue(page.locator("id=message-div").isVisible(), "Success message div should be visible after clicking the register email link");
     }
     // Integration function end: Email
     // Integration function end: Auth
