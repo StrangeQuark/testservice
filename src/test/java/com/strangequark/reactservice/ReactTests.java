@@ -3,6 +3,7 @@
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.AuthUtility;
@@ -10,10 +11,8 @@ import org.junit.jupiter.api.*;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ReactTests {
@@ -21,6 +20,7 @@ public class ReactTests {
     private Page page;
     private Browser browser;
     private ReactFunctions reactFunctions;
+    private final Locator.WaitForOptions WAIT_FOR_VISIBLE = new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE);
     private static APIRequestContext apiRequestContext; // Integration function start: Auth
     private AuthFunctions authFunctions;
     private AuthUtility authUtility;
@@ -60,6 +60,16 @@ public class ReactTests {
             assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
         }// Integration function end: Auth
     }
+
+    @Test
+    public void ensureHomePageLoading() {
+        reactFunctions.navigateToHomePage(page);
+
+        Locator homeButton = page.getByText("Home");
+
+        homeButton.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(homeButton.isVisible(), "Home button should be visible in the toolbar after navigating to home page");
+    }
     // Integration function start: Auth
     @Test
     public void ensureLoginDivLoading() {
@@ -67,7 +77,7 @@ public class ReactTests {
 
         Locator loginDiv = page.locator("id=login-div");
 
-        loginDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
     }
 
@@ -77,7 +87,7 @@ public class ReactTests {
 
         Locator registerDiv = page.locator("id=register-div");
 
-        registerDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        registerDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(registerDiv.isVisible(), "Register div should be visible after navigating to register page");
     }
 
@@ -88,7 +98,7 @@ public class ReactTests {
 
         Locator requestSuccessTextField = page.locator("id=request-success-text-field");
 
-        requestSuccessTextField.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        requestSuccessTextField.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(requestSuccessTextField.isVisible(), "Request success div should be visible after navigating to register page");
     }
 
@@ -98,7 +108,7 @@ public class ReactTests {
 
         Locator usernameButton = page.getByText(username);
 
-        usernameButton.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        usernameButton.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(usernameButton.isVisible(), "The logged in user's button should be visible after logging in");
     }
     // Integration function start: Email
@@ -108,7 +118,7 @@ public class ReactTests {
 
         Locator resetPasswordDiv = page.locator("id=request-div");
 
-        resetPasswordDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        resetPasswordDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(resetPasswordDiv.isVisible(), "Reset password div should be visible after navigating to password-reset page");
     }
 
@@ -118,7 +128,7 @@ public class ReactTests {
 
         Locator newPasswordDiv = page.locator("id=request-div");
 
-        newPasswordDiv.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        newPasswordDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(newPasswordDiv.isVisible(), "New password div should be visible after navigating to new-password page");
     }
 
@@ -126,7 +136,10 @@ public class ReactTests {
     public void userRegisterEmailTest() {
         reactFunctions.registerAndEnable(page, username, email, password);
 
-        assertTrue(page.locator("id=message-div").isVisible(), "Success message div should be visible after clicking the register email link");
+        Locator messageDiv = page.locator("id=message-div");
+
+        messageDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(messageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
     }
     // Integration function end: Email
     // Integration function end: Auth
