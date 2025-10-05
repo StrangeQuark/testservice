@@ -1,3 +1,5 @@
+// Integration file: React
+
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.FrameLocator;
