@@ -6,6 +6,7 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactAuthTests extends ReactTestsBase {
@@ -78,6 +79,28 @@ public class ReactAuthTests extends ReactTestsBase {
 
         messageDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(messageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
+    }
+
+    @Test
+    public void userResetPassword() {
+        reactFunctions.registerAndEnable(page, username, email, password);
+
+        reactFunctions.navigateToPasswordReset(page);
+
+        reactFunctions.fillAndSubmitPasswordResetForm(page, username);
+
+        reactFunctions.navigateToMailbox(page);
+
+        reactFunctions.clickPasswordResetEmail(page, email);
+
+        password = "newPassword123!";
+        reactFunctions.fillAndSubmitNewPasswordForm(page, password);
+
+        Locator successDiv = page.locator("id=request-success-text-field");
+
+        successDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(successDiv.isVisible(), "Success message div should be visible after updating the user's password");
+        assertEquals("Your password has been successfully reset", successDiv.innerText(), "The success message div text is incorrect");
     }
     // Integration function end: Email
 }

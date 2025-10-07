@@ -32,6 +32,10 @@ public class ReactFunctions {
         page.locator("id=confirm-password").fill(password);
 
         page.click("id=submit-button");
+
+        // We must wait for the success div to ensure request sent
+        page.locator("id=request-success-text-field")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public void fillAndSubmitLoginForm(Page page, String username, String password) {
@@ -41,12 +45,30 @@ public class ReactFunctions {
         page.click("id=submit-button");
     }
 
+    public void fillAndSubmitPasswordResetForm(Page page, String username) {
+        page.locator("id=credentials").fill(username);
+
+        page.click("id=submit-button");
+
+        // We must wait for the success div to ensure request sent
+        page.locator("id=request-success-div")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
+    public void fillAndSubmitNewPasswordForm(Page page, String newPassword) {
+        page.locator("id=password").fill(newPassword);
+        page.locator("id=confirm-password").fill(newPassword);
+
+        page.click("id=submit-button");
+
+        // We must wait for the success div to ensure request sent
+        page.locator("id=request-success-div")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+    }
+
     public void registerAndEnable(Page page, String username, String email, String password) {
         navigateToRegister(page);
         fillAndSubmitRegisterForm(page, username, email, password);
-        // We must wait for the success div otherwise we sometimes navigateToMailbox too quickly and don't send the requests
-        page.locator("id=request-success-text-field")
-                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         // Integration function start: Email
         navigateToMailbox(page);
         page.getByText(email).click();
@@ -83,6 +105,27 @@ public class ReactFunctions {
 
     public void navigateToMailbox(Page page) {
         page.navigate("localhost:1080");
+    }
+
+    public void clickPasswordResetEmail(Page page, String email) {
+        Locator subline = page.locator("span.title-subline.ng-binding")
+                .filter(new Locator.FilterOptions().setHasText(email));
+
+        Locator parent = subline.locator("..")
+                .filter(new Locator.FilterOptions().setHasText("Password reset"));
+
+        parent.click(new Locator.ClickOptions().setTimeout(10000));
+
+        FrameLocator emailFrame = page.frameLocator("iframe").first();
+
+        Locator resetLink = emailFrame.getByText("Reset password");
+        resetLink.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+
+        String resetUrl = resetLink.getAttribute("href");
+        assertNotNull(resetUrl, "Reset link should have an href attribute");
+
+        page.navigate(resetUrl);
+        page.locator("id=request-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
     // Integration function end: Email
     // Integration function start: File
