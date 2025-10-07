@@ -99,6 +99,24 @@ public class ReactFunctions {
     public void navigateToUserSettings(Page page) {
         page.navigate("localhost:6080/settings");
     }
+
+    public void clickEditAndSubmitUpdateUsername(Page page, String username, String password) {
+        page.getByTestId("update-username").click();
+
+        page.locator("id=input-newUsername-0").fill(username);
+        page.locator("id=input-password-1").fill(password);
+
+        page.getByText("Save").click();
+    }
+
+    public void clickEditAndSubmitUpdateEmail(Page page, String email, String password) {
+        page.getByTestId("update-email").click();
+
+        page.locator("id=input-newEmail-0").fill(email);
+        page.locator("id=input-password-1").fill(password);
+
+        page.getByText("Save").click();
+    }
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
