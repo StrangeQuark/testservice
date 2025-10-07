@@ -50,6 +50,28 @@ public class ReactAuthTests extends ReactTestsBase {
         usernameButton.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(usernameButton.isVisible(), "The logged in user's button should be visible after logging in");
     }
+
+    @Test
+    public void ensureUserSettingsRedirectsToLogin() {
+        reactFunctions.navigateToUserSettings(page);
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
+    }
+
+    @Test
+    public void userEnsureUserSettingsLoading() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToUserSettings(page);
+
+        Locator accountSettingsHeader = page.getByText("Account Information");
+
+        accountSettingsHeader.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(accountSettingsHeader.isVisible(), "Account settings header should be visible after navigating to settings page");
+    }
     // Integration function start: Email
     @Test
     public void ensurePasswordResetDivLoading() {

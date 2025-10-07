@@ -43,6 +43,8 @@ public class ReactFunctions {
         page.locator("id=password").fill(password);
 
         page.click("id=submit-button");
+
+        page.waitForURL("http://localhost:6080/");
     }
 
     public void fillAndSubmitPasswordResetForm(Page page, String username) {
@@ -92,6 +94,10 @@ public class ReactFunctions {
         navigateToLogin(page);
 
         fillAndSubmitLoginForm(page, username, password);
+    }
+
+    public void navigateToUserSettings(Page page) {
+        page.navigate("localhost:6080/settings");
     }
     // Integration function end: Auth
     // Integration function start: Email
