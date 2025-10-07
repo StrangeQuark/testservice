@@ -6,6 +6,8 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -71,6 +73,37 @@ public class ReactAuthTests extends ReactTestsBase {
 
         accountSettingsHeader.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(accountSettingsHeader.isVisible(), "Account settings header should be visible after navigating to settings page");
+    }
+
+    @Test
+    public void userUpdateUsernameTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToUserSettings(page);
+
+        username = "test_" + UUID.randomUUID();
+        reactFunctions.clickEditAndSubmitUpdateUsername(page, username, password);
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's username");
+    }
+
+    @Test
+    public void userUpdateEmailTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToUserSettings(page);
+
+        email = "testEmail_" + UUID.randomUUID() + "@email.com";
+        reactFunctions.clickEditAndSubmitUpdateEmail(page, email, password);
+
+        Locator emailTextElement = page.getByText(email);
+
+        emailTextElement.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(emailTextElement.isVisible(), "Email should be visible after updating");
+        assertEquals("Email: " + email, emailTextElement.innerText(), "New email should match the email displayed on the page");
     }
     // Integration function start: Email
     @Test
