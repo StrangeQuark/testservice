@@ -127,6 +127,15 @@ public class ReactFunctions {
 
         page.getByText("Save").click();
     }
+
+    public void clickEditAndSubmitDeleteAccount(Page page, String username, String password) {
+        page.getByTestId("delete-account-button").click();
+
+        page.locator("id=input-username-0").fill(username);
+        page.locator("id=input-password-1").fill(password);
+
+        page.getByText("Save").click();
+    }
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
