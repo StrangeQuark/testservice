@@ -2,6 +2,7 @@
 
 package com.strangequark.reactservice;
 
+import com.microsoft.playwright.Download;
 import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -18,6 +19,15 @@ public class ReactFunctions {
 
     public void navigateToHomePage(Page page) {
         page.navigate("localhost:6080/");
+    }
+
+    public void handleNextAlert(Page page, boolean accept) {
+        page.onceDialog(dialog -> {
+            if(accept)
+                dialog.accept();
+            else
+                dialog.dismiss();
+        });
     }
     // Integration function start: Auth
     public void navigateToLogin(Page page) {
@@ -194,8 +204,24 @@ public class ReactFunctions {
         page.getByText(collectionName).click();
     }
 
+    public void clickCollectionManagementIcon(Page page) {
+        page.getByTestId("cog-icon").click();
+    }
+
+    public void clickDeleteCollectionButton(Page page) {
+        page.getByText("Delete Collection").click();
+    }
+
     public void clickAndSelectUploadFile(Page page, Path filePath) {
         page.locator("input[type='file']").setInputFiles(filePath);
+    }
+
+    public Download clickFileDownloadButton(Page page) {
+        return page.waitForDownload(() -> page.getByText("Download").click());
+    }
+
+    public void clickDeleteFile(Page page) {
+        page.getByText("Delete").click();
     }
     // Integration function end: File
     // Integration function start: Vault

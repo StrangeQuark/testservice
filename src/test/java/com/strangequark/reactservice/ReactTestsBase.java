@@ -21,6 +21,7 @@ public class ReactTestsBase {
     public Browser browser;
     public ReactFunctions reactFunctions;
     public final Locator.WaitForOptions WAIT_FOR_VISIBLE = new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE);
+    public final Locator.WaitForOptions WAIT_FOR_DETACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED);
     public static APIRequestContext apiRequestContext; // Integration function start: Auth
     public AuthFunctions authFunctions;
 
