@@ -105,6 +105,22 @@ public class ReactAuthTests extends ReactTestsBase {
         assertTrue(emailTextElement.isVisible(), "Email should be visible after updating");
         assertEquals("Email: " + email, emailTextElement.innerText(), "New email should match the email displayed on the page");
     }
+
+    @Test
+    public void userUpdatePasswordTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToUserSettings(page);
+
+        String newPassword = "newPassword123!";
+        reactFunctions.clickEditAndSubmitUpdatePassword(page, password, newPassword);
+        password = newPassword;
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's username");
+    }
     // Integration function start: Email
     @Test
     public void ensurePasswordResetDivLoading() {
