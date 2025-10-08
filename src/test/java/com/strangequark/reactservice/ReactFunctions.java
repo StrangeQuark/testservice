@@ -7,6 +7,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
+import java.nio.file.Path;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReactFunctions {
@@ -174,6 +176,26 @@ public class ReactFunctions {
     // Integration function start: File
     public void clickToolbarFilesButton(Page page) {
         page.getByText("Files").click();
+    }
+
+    public void navigateToFiles(Page page) {
+        page.navigate("localhost:6080/files");
+    }
+
+    public void fillAndSubmitCreateCollectionForm(Page page, String collectionName) {
+        page.getByText("Create collection").click();
+
+        page.locator("id=input-collectionName-0").fill(collectionName);
+
+        page.getByText("Save").click();
+    }
+
+    public void clickCollectionIcon(Page page, String collectionName) {
+        page.getByText(collectionName).click();
+    }
+
+    public void clickAndSelectUploadFile(Page page, Path filePath) {
+        page.locator("input[type='file']").setInputFiles(filePath);
     }
     // Integration function end: File
     // Integration function start: Vault

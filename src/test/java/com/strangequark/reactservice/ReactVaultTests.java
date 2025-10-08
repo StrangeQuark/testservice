@@ -18,6 +18,7 @@ public class ReactVaultTests extends ReactTestsBase{
         Locator loginDiv = page.locator("id=login-div");
 
         loginDiv.waitFor(WAIT_FOR_VISIBLE);
-        assertTrue(loginDiv.isVisible(), "Login div should be visible after navigating to login page");
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after clicking the Vault button on the " +
+                "toolbar without logging in");
     }
 }
