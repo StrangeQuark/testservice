@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactFileTests extends ReactTestsBase {
     @Test
-    public void ensureToolbarFilesButtonRedirectsToLogin() {
+    public void ensureToolbarFilesButtonRedirectsToLoginTest() {
         reactFunctions.navigateToLogin(page);
 
         reactFunctions.clickToolbarFilesButton(page);

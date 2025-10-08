@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactTests extends ReactTestsBase {
     @Test
-    public void ensureHomePageLoading() {
+    public void ensureHomePageLoadingTest() {
         reactFunctions.navigateToHomePage(page);
 
         Locator homeButton = page.getByText("Home");
