@@ -13,6 +13,7 @@ public class ReactFunctions {
     public ReactFunctions() {
 
     }
+
     public void navigateToHomePage(Page page) {
         page.navigate("localhost:6080/");
     }
@@ -114,6 +115,15 @@ public class ReactFunctions {
 
         page.locator("id=input-newEmail-0").fill(email);
         page.locator("id=input-password-1").fill(password);
+
+        page.getByText("Save").click();
+    }
+
+    public void clickEditAndSubmitUpdatePassword(Page page, String password, String newPassword) {
+        page.getByTestId("update-password").click();
+
+        page.locator("id=input-password-0").fill(password);
+        page.locator("id=input-newPassword-1").fill(newPassword);
 
         page.getByText("Save").click();
     }

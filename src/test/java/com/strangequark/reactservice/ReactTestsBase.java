@@ -21,9 +21,9 @@ public class ReactTestsBase {
     public static APIRequestContext apiRequestContext; // Integration function start: Auth
     public AuthFunctions authFunctions;
 
-    String username;
-    String email;
-    String password;// Integration function end: Auth
+    public String username;
+    public String email;
+    public String password;// Integration function end: Auth
 
     @BeforeAll
     public void beforeAll() {
