@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactVaultTests extends ReactTestsBase{
+    // Integration function start: Auth
     @Test
     public void ensureToolbarVaultButtonRedirectsToLoginTest() {
         reactFunctions.navigateToLogin(page);
@@ -21,4 +22,5 @@ public class ReactVaultTests extends ReactTestsBase{
         assertTrue(loginDiv.isVisible(), "Login div should be visible after clicking the Vault button on the " +
                 "toolbar without logging in");
     }
+    // Integration function end: Auth
 }
