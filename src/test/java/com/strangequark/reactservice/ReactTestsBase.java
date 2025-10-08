@@ -7,6 +7,9 @@ import com.microsoft.playwright.options.WaitForSelectorState;
 import com.strangequark.authservice.AuthFunctions;
 import org.junit.jupiter.api.*;
 
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,13 +27,18 @@ public class ReactTestsBase {
     public String username;
     public String email;
     public String password;// Integration function end: Auth
+    public String collectionName;// Integration function start: File
+    public String textFileName;
+    public Path textFilePath;// Integration function end: File
 
     @BeforeAll
-    public void beforeAll() {
+    public void beforeAll() throws URISyntaxException {
         playwright = Playwright.create();
         reactFunctions = new ReactFunctions();
         apiRequestContext = playwright.request().newContext(); // Integration line: Auth
         authFunctions = new AuthFunctions(apiRequestContext);// Integration line: Auth
+        textFileName = "testUploadFile.txt";// Integration line: File
+        textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());// Integration line: File
     }
 
     @BeforeEach
@@ -43,6 +51,7 @@ public class ReactTestsBase {
             email = username + "@testEmail.com";
             password = "testPassword123!";
         }// Integration function end: Auth
+        collectionName = "collection_" + UUID.randomUUID();// Integration line: File
     }
 
     @AfterEach
