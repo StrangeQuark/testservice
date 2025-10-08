@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactAuthTests extends ReactTestsBase {
     @Test
-    public void ensureLoginDivLoading() {
+    public void ensureLoginDivLoadingTest() {
         reactFunctions.navigateToLogin(page);
 
         Locator loginDiv = page.locator("id=login-div");
@@ -22,7 +22,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
-    public void ensureRegisterDivLoading() {
+    public void ensureRegisterDivLoadingTest() {
         reactFunctions.navigateToRegister(page);
 
         Locator registerDiv = page.locator("id=register-div");
@@ -53,7 +53,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
-    public void ensureUserSettingsRedirectsToLogin() {
+    public void ensureUserSettingsRedirectsToLoginTest() {
         reactFunctions.navigateToUserSettings(page);
 
         Locator loginDiv = page.locator("id=login-div");
@@ -63,7 +63,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
-    public void userEnsureUserSettingsLoading() {
+    public void userEnsureUserSettingsLoadingTest() {
         reactFunctions.registerEnableAndLogin(page, username, email, password);
 
         reactFunctions.navigateToUserSettings(page);
@@ -140,7 +140,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
     // Integration function start: Email
     @Test
-    public void ensurePasswordResetDivLoading() {
+    public void ensurePasswordResetDivLoadingTest() {
         reactFunctions.navigateToPasswordReset(page);
 
         Locator resetPasswordDiv = page.locator("id=request-div");
@@ -150,7 +150,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
-    public void ensureNewPasswordDivLoading() {
+    public void ensureNewPasswordDivLoadingTest() {
         reactFunctions.navigateToNewPassword(page);
 
         Locator newPasswordDiv = page.locator("id=request-div");
@@ -170,7 +170,7 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
-    public void userResetPassword() {
+    public void userResetPasswordTest() {
         reactFunctions.registerAndEnable(page, username, email, password);
 
         reactFunctions.navigateToPasswordReset(page);

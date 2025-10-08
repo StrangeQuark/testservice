@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReactVaultTests extends ReactTestsBase{
     @Test
-    public void ensureToolbarVaultButtonRedirectsToLogin() {
+    public void ensureToolbarVaultButtonRedirectsToLoginTest() {
         reactFunctions.navigateToLogin(page);
 
         reactFunctions.clickToolbarVaultButton(page);
