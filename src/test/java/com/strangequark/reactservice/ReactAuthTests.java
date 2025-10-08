@@ -8,8 +8,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactAuthTests extends ReactTestsBase {
     @Test
@@ -119,7 +118,25 @@ public class ReactAuthTests extends ReactTestsBase {
         Locator loginDiv = page.locator("id=login-div");
 
         loginDiv.waitFor(WAIT_FOR_VISIBLE);
-        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's username");
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's password");
+    }
+
+    @Test
+    public void deleteUserTest() {
+        username = "test_" + UUID.randomUUID();
+        email = username + "@testEmail.com";
+        password = "testPassword123!";
+
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToUserSettings(page);
+
+        reactFunctions.clickEditAndSubmitDeleteAccount(page, username, password);
+
+        Locator loginDiv = page.locator("id=login-div");
+
+        loginDiv.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginDiv.isVisible(), "Login div should be visible after deleting user");
     }
     // Integration function start: Email
     @Test
