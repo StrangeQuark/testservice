@@ -148,6 +148,18 @@ public class ReactFunctions {
 
         page.getByText("Save").click();
     }
+
+    public void clickManageUsersButton(Page page) {
+        page.getByText("Manage Users").click();
+    }
+
+    public void searchForAndSelectUserInUserManagementPopup(Page page, String username) {
+        page.locator("id=search-users").fill(username);
+
+        page.getByText("Search").click();
+
+        page.locator("id=search-result").click();
+    }
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {

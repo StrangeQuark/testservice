@@ -6,6 +6,8 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactFileTests extends ReactTestsBase {
@@ -176,5 +178,34 @@ public class ReactFileTests extends ReactTestsBase {
 
         collectionPageHeader.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(collectionPageHeader.isVisible(), "User should have been navigated to collection selection after deleting a collection");
+    }
+    // Integration function start: Auth
+    @Test
+    public void userAddUserToCollectionTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToFiles(page);
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+        reactFunctions.clickCollectionIcon(page, collectionName);
+        reactFunctions.clickCollectionManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        Locator addedUsername = page.getByText(testUsername);
+        Locator addedEmail = page.getByText(testEmail);
+
+        addedUsername.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(addedUsername.isVisible(), "Added username should be present in the user management popup");
+
+        addedEmail.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(addedEmail.isVisible(), "Added email should be present in the user management popup");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
     }
 }
