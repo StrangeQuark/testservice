@@ -223,6 +223,18 @@ public class ReactFunctions {
     public void clickDeleteFile(Page page) {
         page.getByText("Delete").click();
     }
+
+    public void clickListenToFile(Page page) {
+        page.getByText("Listen").click();
+    }
+
+    public void clickStreamFile(Page page) {
+        page.getByText("Stream").click();
+    }
+
+    public void clickViewFile(Page page) {
+        page.getByText("View").click();
+    }
     // Integration function end: File
     // Integration function start: Vault
     public void clickToolbarVaultButton(Page page) {

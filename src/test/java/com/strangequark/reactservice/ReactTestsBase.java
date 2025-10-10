@@ -30,7 +30,13 @@ public class ReactTestsBase {
     public String password;// Integration function end: Auth
     public String collectionName;// Integration function start: File
     public String textFileName;
-    public Path textFilePath;// Integration function end: File
+    public Path textFilePath;
+    public String audioFileName;
+    public Path audioFilePath;
+    public String imageFileName;
+    public Path imageFilePath;
+    public String videoFileName;
+    public Path videoFilePath;// Integration function end: File
 
     @BeforeAll
     public void beforeAll() throws URISyntaxException {
@@ -38,8 +44,15 @@ public class ReactTestsBase {
         reactFunctions = new ReactFunctions();
         apiRequestContext = playwright.request().newContext(); // Integration line: Auth
         authFunctions = new AuthFunctions(apiRequestContext);// Integration line: Auth
-        textFileName = "testUploadFile.txt";// Integration line: File
-        textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());// Integration line: File
+        textFileName = "testUploadFile.txt";// Integration function start: File
+        textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());
+        audioFileName = "testAudioFile.mp3";
+        audioFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + audioFileName).toURI());
+        imageFileName = "testImageFile.png";
+        imageFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + imageFileName).toURI());
+        videoFileName = "testVideoFile.webm";
+        videoFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + videoFileName).toURI());
+        // Integration function end: File
     }
 
     @BeforeEach

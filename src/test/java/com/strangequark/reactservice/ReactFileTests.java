@@ -89,6 +89,76 @@ public class ReactFileTests extends ReactTestsBase {
     }
 
     @Test
+    public void userListenAudioFileTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.navigateToFiles(page);
+
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+
+        reactFunctions.clickCollectionIcon(page, collectionName);
+
+        reactFunctions.clickAndSelectUploadFile(page, audioFilePath);
+
+        reactFunctions.clickListenToFile(page);
+
+        Locator audioPlayer = page.getByTestId("audio-player");
+        audioPlayer.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(audioPlayer.isVisible(), "Audio player should be visible after clicking Listen button");
+
+        Locator audioSource = page.getByTestId("audio-source");
+        String src = audioSource.getAttribute("src");
+        Assertions.assertNotNull(src, "Audio src should not be null");
+        Assertions.assertTrue(src.startsWith("blob:"), "Audio src should be a blob URL");
+
+        String type = audioSource.getAttribute("type");
+        Assertions.assertEquals("audio/mpeg", type, "Expected correct MIME type");
+    }
+
+    @Test
+    public void userStreamVideoFileTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.navigateToFiles(page);
+
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+
+        reactFunctions.clickCollectionIcon(page, collectionName);
+
+        reactFunctions.clickAndSelectUploadFile(page, videoFilePath);
+
+        reactFunctions.clickStreamFile(page);
+
+        Locator videoPlayer = page.getByTestId("video-player");
+        videoPlayer.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(videoPlayer.isVisible(), "Video player should be visible after clicking Stream button");
+
+        String src = videoPlayer.getAttribute("src");
+        assertNotNull(src, "Video src should not be null");
+        assertTrue(src.startsWith("blob:"), "Video src should be a blob URL");
+    }
+
+    @Test
+    public void userViewImageFileTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.navigateToFiles(page);
+
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+
+        reactFunctions.clickCollectionIcon(page, collectionName);
+
+        reactFunctions.clickAndSelectUploadFile(page, imageFilePath);
+
+        reactFunctions.clickViewFile(page);
+
+        Locator imageViewer = page.getByTestId("image");
+        imageViewer.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(imageViewer.isVisible(), "Image viewer should be visible after clicking View button");
+
+        String src = imageViewer.getAttribute("src");
+        assertNotNull(src, "Image src should not be null");
+        assertTrue(src.startsWith("blob:"), "Image src should be a blob URL");
+    }
+
+    @Test
     public void userDeleteCollectionTest() {
         reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
         reactFunctions.navigateToFiles(page);
