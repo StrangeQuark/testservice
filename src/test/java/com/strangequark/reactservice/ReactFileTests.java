@@ -6,8 +6,7 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
-import java.util.UUID;
-
+import java.util.UUID;// Integration line: Auth
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactFileTests extends ReactTestsBase {
