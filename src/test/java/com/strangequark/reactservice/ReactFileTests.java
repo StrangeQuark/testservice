@@ -207,4 +207,31 @@ public class ReactFileTests extends ReactTestsBase {
 
         authFunctions.deleteUser(testUsername, testEmail, testPassword);
     }
+
+    @Test
+    public void userAddUserToCollectionAndChangeRoleTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToFiles(page);
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+        reactFunctions.clickCollectionIcon(page, collectionName);
+        reactFunctions.clickCollectionManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        reactFunctions.changeUserRoleInUserManagementPopup(page, testUsername, "MANAGER");
+
+        Locator newRole = page.getByText("MANAGER");
+
+        newRole.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(newRole.isVisible(), "New role should be present in the user management popup");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
+    }
 }

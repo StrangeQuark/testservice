@@ -160,6 +160,15 @@ public class ReactFunctions {
 
         page.locator("id=search-result").click();
     }
+
+    public void changeUserRoleInUserManagementPopup(Page page, String username, String role) {
+        Locator userRow = page.locator(".user-row", new Page.LocatorOptions().setHasText(username));
+        userRow.getByTestId("edit-user-role-button").click();
+
+        page.getByTestId("role-select").selectOption(role);
+
+        page.getByText("Save").click();
+    }
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
