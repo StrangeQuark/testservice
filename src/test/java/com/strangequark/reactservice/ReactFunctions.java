@@ -169,6 +169,11 @@ public class ReactFunctions {
 
         page.getByText("Save").click();
     }
+
+    public void deleteUserInUserManagementPopup(Page page, String username) {
+        Locator userRow = page.locator(".user-row", new Page.LocatorOptions().setHasText(username));
+        userRow.getByTestId("delete-user-button").click();
+    }
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
