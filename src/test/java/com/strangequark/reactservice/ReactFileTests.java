@@ -234,4 +234,32 @@ public class ReactFileTests extends ReactTestsBase {
 
         authFunctions.deleteUser(testUsername, testEmail, testPassword);
     }
+
+    @Test
+    public void userAddUserToCollectionThenDeleteFromCollectionTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        reactFunctions.navigateToFiles(page);
+        reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
+        reactFunctions.clickCollectionIcon(page, collectionName);
+        reactFunctions.clickCollectionManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        reactFunctions.handleNextAlert(page, true);
+        reactFunctions.deleteUserInUserManagementPopup(page, testUsername);
+
+        Locator testUser = page.getByText(testUsername);
+
+        testUser.waitFor(WAIT_FOR_DETACHED);
+        assertFalse(testUser.isVisible(), "Test user should not be present in the user management popup after deletion");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
+    }
 }
