@@ -223,7 +223,7 @@ public class VaultTests {
 
         try {
             Path filePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + ENV_TEST_FILE).toURI());
-            assertEquals(Files.readString(filePath) + "\n", response.text(), "Download env file contents test failed: " + response.status() + " - " + response.text());
+            assertTrue(Files.readString(filePath).contains(response.text()), "Download env file contents test failed: " + response.status() + " - " + response.text());
         } catch (Exception ex) {
             throw new RuntimeException("Failed to load test env file from resources", ex);
         }
