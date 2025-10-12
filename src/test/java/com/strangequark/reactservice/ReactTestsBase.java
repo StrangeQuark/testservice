@@ -42,6 +42,8 @@ public class ReactTestsBase {
     public String environmentName;
     public String testVariableKey;
     public String testVariableValue;
+    public String envFileName;
+    public Path envFilePath;
     // Integration function end: Vault
 
     @BeforeAll
@@ -59,6 +61,10 @@ public class ReactTestsBase {
         videoFileName = "testVideoFile.webm";
         videoFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + videoFileName).toURI());
         // Integration function end: File
+        // Integration function start: Vault
+        envFileName = "testEnvFile.env";
+        envFilePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + envFileName).toURI());
+        // Integration function end: Vault
     }
 
     @BeforeEach
@@ -74,7 +80,7 @@ public class ReactTestsBase {
         collectionName = "collection_" + UUID.randomUUID();// Integration line: File
         serviceName = "service_" + UUID.randomUUID();// Integration function start: Vault
         environmentName = "environment_" + UUID.randomUUID();
-        testVariableKey = "testKey" + UUID.randomUUID();
+        testVariableKey = "testKey_" + UUID.randomUUID();
         testVariableValue = "testValue_" + UUID.randomUUID();
         // Integration function end: Vault
     }

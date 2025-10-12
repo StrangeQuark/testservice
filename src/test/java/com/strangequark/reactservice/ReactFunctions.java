@@ -8,6 +8,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -246,6 +248,15 @@ public class ReactFunctions {
         return page.waitForDownload(() -> page.getByText("Download").click());
     }
 
+    public String getFileContent(Path filePath) {
+        try {
+            return Files.readString(filePath);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public void clickDeleteFile(Page page) {
         page.getByText("Delete").click();
     }
@@ -304,6 +315,46 @@ public class ReactFunctions {
         page.locator("id=input-value-1").fill(value);
 
         page.getByText("Save").click();
+    }
+
+    public void unmaskVariable(Page page, String key) {
+        page.locator("id=unmask-" + key).click();
+    }
+
+    public void deleteVariable(Page page, String key) {
+        page.locator("id=delete-" + key).click();
+    }
+
+    public void uploadEnvFile(Page page, Path filePath) {
+        page.locator("input[type='file']").setInputFiles(filePath);
+    }
+
+    public Download clickEnvDownloadButton(Page page) {
+        return page.waitForDownload(() -> page.locator("id=env-file-download").click());
+    }
+
+    public String getEnvFileContent(Path filePath) {
+        try {
+            return Files.readString(filePath);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public void createServiceEnvironmentAndVariable(Page page, String serviceName, String environmentName,
+                                                    String testVariableKey, String testVariableValue) {
+        fillAndSubmitCreateServiceForm(page, serviceName);
+        selectService(page, serviceName);
+
+        fillAndSubmitCreateEnvironmentForm(page, environmentName);
+        selectEnvironment(page, environmentName);
+
+        fillAndSubmitAddVariableForm(page, testVariableKey, testVariableValue);
+
+        Locator variableKeyInput = page.locator("id=key-" + testVariableKey);
+
+        variableKeyInput.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
     // Integration function end: Vault
 }
