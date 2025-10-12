@@ -68,6 +68,14 @@ public class ReactFileTests extends ReactTestsBase {
         Download download = reactFunctions.clickFileDownloadButton(page);
 
         assertEquals(textFileName, download.suggestedFilename(), "Download file name should match textFileName");
+
+        String fileContent = reactFunctions.getFileContent(download.path());
+
+        String expectedContent = "// Integration file: File\n" +
+                "\n" +
+                "This text file is used for testing the Fileservice";
+
+        assertEquals(expectedContent, fileContent, "Downloaded test file contents should match expected");
     }
 
     @Test
