@@ -22,6 +22,7 @@ public class ReactTestsBase {
     public ReactFunctions reactFunctions;
     public final Locator.WaitForOptions WAIT_FOR_VISIBLE = new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE);
     public final Locator.WaitForOptions WAIT_FOR_DETACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED);
+    public final Locator.WaitForOptions WAIT_FOR_ATTACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED);
     public static APIRequestContext apiRequestContext; // Integration function start: Auth
     public AuthFunctions authFunctions;
 
@@ -37,6 +38,11 @@ public class ReactTestsBase {
     public Path imageFilePath;
     public String videoFileName;
     public Path videoFilePath;// Integration function end: File
+    public String serviceName;// Integration function start: Vault
+    public String environmentName;
+    public String testVariableKey;
+    public String testVariableValue;
+    // Integration function end: Vault
 
     @BeforeAll
     public void beforeAll() throws URISyntaxException {
@@ -66,6 +72,11 @@ public class ReactTestsBase {
             password = "testPassword123!";
         }// Integration function end: Auth
         collectionName = "collection_" + UUID.randomUUID();// Integration line: File
+        serviceName = "service_" + UUID.randomUUID();// Integration function start: Vault
+        environmentName = "environment_" + UUID.randomUUID();
+        testVariableKey = "testKey" + UUID.randomUUID();
+        testVariableValue = "testValue_" + UUID.randomUUID();
+        // Integration function end: Vault
     }
 
     @AfterEach

@@ -266,5 +266,44 @@ public class ReactFunctions {
     public void clickToolbarVaultButton(Page page) {
         page.getByText("Vault").click();
     }
+
+    public void navigateToVault(Page page) {
+        page.navigate("localhost:6080/vault");
+    }
+
+    public void fillAndSubmitCreateServiceForm(Page page, String serviceName) {
+        page.getByText("Create service").click();
+
+        page.locator("id=input-serviceName-0").fill(serviceName);
+
+        page.getByText("Save").click();
+    }
+
+    public void selectService(Page page, String serviceName) {
+        page.getByText(serviceName).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
+        page.locator("id=service-select").selectOption(serviceName);
+    }
+
+    public void fillAndSubmitCreateEnvironmentForm(Page page, String environmentName) {
+        page.getByText("Create environment").click();
+
+        page.locator("id=input-environmentName-0").fill(environmentName);
+
+        page.getByText("Save").click();
+    }
+
+    public void selectEnvironment(Page page, String environmentName) {
+        page.getByText(environmentName).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
+        page.locator("id=environment-select").selectOption(environmentName);
+    }
+
+    public void fillAndSubmitAddVariableForm(Page page, String key, String value) {
+        page.getByText("Add var").click();
+
+        page.locator("id=input-key-0").fill(key);
+        page.locator("id=input-value-1").fill(value);
+
+        page.getByText("Save").click();
+    }
     // Integration function end: Vault
 }

@@ -261,5 +261,5 @@ public class ReactFileTests extends ReactTestsBase {
         assertFalse(testUser.isVisible(), "Test user should not be present in the user management popup after deletion");
 
         authFunctions.deleteUser(testUsername, testEmail, testPassword);
-    }
+    } // Integration function end: Auth
 }
