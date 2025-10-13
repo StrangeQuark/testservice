@@ -342,6 +342,18 @@ public class ReactFunctions {
         }
     }
 
+    public void clickServiceManagementIcon(Page page) {
+        page.getByTestId("cog-icon").click();
+    }
+
+    public void clickDeleteEnvironmentButton(Page page) {
+        page.getByText("Delete Environment").click();
+    }
+
+    public void clickDeleteServiceButton(Page page) {
+        page.getByText("Delete Service").click();
+    }
+
     public void createServiceEnvironmentAndVariable(Page page, String serviceName, String environmentName,
                                                     String testVariableKey, String testVariableValue) {
         fillAndSubmitCreateServiceForm(page, serviceName);
