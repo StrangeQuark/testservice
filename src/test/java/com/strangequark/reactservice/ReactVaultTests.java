@@ -6,6 +6,8 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactVaultTests extends ReactTestsBase {
@@ -92,7 +94,10 @@ public class ReactVaultTests extends ReactTestsBase {
         page.evaluate("""
             () => { 
                 window.__copiedText = ''; 
-                navigator.clipboard.writeText = text => { window.__copiedText = text; return Promise.resolve(); }; 
+                navigator.clipboard.writeText = text => { 
+                    window.__copiedText = text;
+                    return Promise.resolve();
+                }; 
             }
         """);
 
@@ -149,4 +154,134 @@ public class ReactVaultTests extends ReactTestsBase {
         String expectedContent = testVariableKey + "=" + testVariableValue + "\n";
         assertEquals(expectedContent, fileContent, "Downloaded env file contents should match expected");
     }
+
+    @Test
+    public void userDeleteEnvironmentTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.navigateToVault(page);
+
+        reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
+        reactFunctions.selectService(page, serviceName);
+
+        reactFunctions.fillAndSubmitCreateEnvironmentForm(page, environmentName);
+        reactFunctions.selectEnvironment(page, environmentName);
+
+        reactFunctions.clickServiceManagementIcon(page);
+
+        reactFunctions.handleNextAlert(page, true);
+        reactFunctions.clickDeleteEnvironmentButton(page);
+
+        page.getByText(environmentName).waitFor(WAIT_FOR_DETACHED);
+
+        Locator environmentSelectOptions = page.locator("#environment-select option");
+        assertFalse(environmentSelectOptions.allInnerTexts().contains(environmentName),
+                "Environment name should be present in the dropdown after deletion");
+    }
+
+    @Test
+    public void userDeleteServiceTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.navigateToVault(page);
+
+        reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
+        reactFunctions.selectService(page, serviceName);
+
+        reactFunctions.clickServiceManagementIcon(page);
+
+        reactFunctions.handleNextAlert(page, true);
+        reactFunctions.clickDeleteServiceButton(page);
+
+        page.getByText(serviceName).waitFor(WAIT_FOR_DETACHED);
+
+        Locator serviceSelectOptions = page.locator("#service-select option");
+        assertFalse(serviceSelectOptions.allInnerTexts().contains(serviceName),
+                "Service name should be present in the dropdown after deletion");
+    }
+    // Integration function start: Auth
+    @Test
+    public void userAddUserToCollectionTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        reactFunctions.navigateToVault(page);
+
+        reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
+        reactFunctions.selectService(page, serviceName);
+
+        reactFunctions.clickServiceManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        Locator addedUsername = page.getByText(testUsername);
+        Locator addedEmail = page.getByText(testEmail);
+
+        addedUsername.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(addedUsername.isVisible(), "Added username should be present in the user management popup");
+
+        addedEmail.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(addedEmail.isVisible(), "Added email should be present in the user management popup");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
+    }
+
+    @Test
+    public void userAddUserToCollectionAndChangeRoleTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        reactFunctions.navigateToVault(page);
+
+        reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
+        reactFunctions.selectService(page, serviceName);
+
+        reactFunctions.clickServiceManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        reactFunctions.changeUserRoleInUserManagementPopup(page, testUsername, "MANAGER");
+
+        Locator newRole = page.getByText("MANAGER");
+
+        newRole.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(newRole.isVisible(), "New role should be present in the user management popup");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
+    }
+
+    @Test
+    public void userAddUserToCollectionThenDeleteFromCollectionTest() {
+        String testUsername = "test_" + UUID.randomUUID();
+        String testEmail = UUID.randomUUID() + "@testEmail.com";
+        String testPassword = "testPassword123!";
+
+        reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        reactFunctions.navigateToVault(page);
+
+        reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
+        reactFunctions.selectService(page, serviceName);
+
+        reactFunctions.clickServiceManagementIcon(page);
+
+        reactFunctions.clickManageUsersButton(page);
+        reactFunctions.searchForAndSelectUserInUserManagementPopup(page, testUsername);
+
+        reactFunctions.handleNextAlert(page, true);
+        reactFunctions.deleteUserInUserManagementPopup(page, testUsername);
+
+        Locator testUser = page.getByText(testUsername);
+
+        testUser.waitFor(WAIT_FOR_DETACHED);
+        assertFalse(testUser.isVisible(), "Test user should not be present in the user management popup after deletion");
+
+        authFunctions.deleteUser(testUsername, testEmail, testPassword);
+    } // Integration function end: Auth
 }
