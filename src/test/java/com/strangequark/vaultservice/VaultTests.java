@@ -8,7 +8,7 @@ import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
-import com.strangequark.authservice.AuthFunctions;
+import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Files;
