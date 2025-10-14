@@ -6,8 +6,8 @@ import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.FormData;
 import com.microsoft.playwright.options.RequestOptions;
-import com.strangequark.authservice.AuthFunctions;
-import com.strangequark.utility.AuthUtility;
+import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.utility.AuthUtility; // Integration line: Auth
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;

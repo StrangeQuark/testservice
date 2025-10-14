@@ -4,7 +4,7 @@ package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import com.strangequark.authservice.AuthFunctions;
+import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import org.junit.jupiter.api.*;
 
 import java.net.URISyntaxException;
