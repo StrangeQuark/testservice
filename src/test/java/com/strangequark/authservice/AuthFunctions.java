@@ -38,14 +38,14 @@ public class AuthFunctions {
 
         return apiRequestContext.post(AUTH_BASE_URL + "/register", RequestOptions.create().setData(requestBody));
     }
-    // Integration function start: Email
+
     public APIResponse enableUser(String email) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("email", email);
 
         return apiRequestContext.post(AUTH_BASE_URL + "/user/enable-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
-    }// Integration function end: Email
+    }
 
     public APIResponse disableUser(String username, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
