@@ -2,20 +2,20 @@
 
 package com.strangequark.authservice;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
+import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(ExtentTestWatcher.class)
 public class AuthTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
@@ -25,18 +25,11 @@ public class AuthTests {
     private String testEmail;
     private String testPassword;
 
-    private static ExtentReports extent;
-    private ExtentTest test;
-
     @BeforeAll
     public static void beforeAll() {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
         authFunctions = new AuthFunctions(apiRequestContext);
-
-        ExtentSparkReporter htmlReporter = new ExtentSparkReporter("test-results/auth-report.html");
-        extent = new ExtentReports();
-        extent.attachReporter(htmlReporter);
     }
 
     @BeforeEach
@@ -48,8 +41,6 @@ public class AuthTests {
         testUsername = "test_" + UUID.randomUUID();
         testEmail = testUsername + "@email.com";
         testPassword = UUID.randomUUID().toString();
-
-        test = extent.createTest(testInfo.getDisplayName());
     }
 
     @AfterEach
@@ -64,11 +55,6 @@ public class AuthTests {
         if(!response.ok()) {
             System.err.println("Cleanup failed for " + testUsername + ": " + response.status() + " - " + response.text());
         }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        extent.flush();
     }
 
     @Test

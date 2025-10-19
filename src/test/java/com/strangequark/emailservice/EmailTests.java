@@ -2,25 +2,22 @@
 
 package com.strangequark.emailservice;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(ExtentTestWatcher.class)
 public class EmailTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
     private static EmailFunctions emailFunctions;
     private static AuthFunctions authFunctions; // Integration line: Auth
-
-    private static ExtentReports extent;
-    private ExtentTest test;
 
     @BeforeAll
     public static void beforeAll() {
@@ -30,20 +27,6 @@ public class EmailTests {
         emailFunctions = new EmailFunctions(apiRequestContext
             , authFunctions // Integration line: Auth
         );
-
-        ExtentSparkReporter htmlReporter = new ExtentSparkReporter("test-results/email-report.html");
-        extent = new ExtentReports();
-        extent.attachReporter(htmlReporter);
-    }
-
-    @BeforeEach
-    void beforeEach(TestInfo testInfo) {
-        test = extent.createTest(testInfo.getDisplayName());
-    }
-
-    @AfterAll
-    static void afterAll() {
-        extent.flush();
     }
 
     @Test
