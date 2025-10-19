@@ -2,6 +2,9 @@
 
 package com.strangequark.fileservice;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -29,6 +32,9 @@ public class FileTests {
 
     private final String TEXT_TEST_FILE = "testUploadFile.txt";
 
+    private static ExtentReports extent;
+    private ExtentTest test;
+
     @BeforeAll
     public static void beforeAll() {
         playwright = Playwright.create();
@@ -37,6 +43,10 @@ public class FileTests {
         fileFunctions = new FileFunctions(apiRequestContext
                 , authFunctions // Integration line: Auth
         );
+
+        ExtentSparkReporter htmlReporter = new ExtentSparkReporter("test-results/file-report.html");
+        extent = new ExtentReports();
+        extent.attachReporter(htmlReporter);
     }
 
     @BeforeEach
@@ -49,6 +59,8 @@ public class FileTests {
 
         APIResponse response = fileFunctions.createCollection(testCollectionName);
         assertTrue(response.ok(), "Create collection setup failed: " + response.status() + " - " + response.text());
+
+        test = extent.createTest(testInfo.getDisplayName());
     }
 
     @AfterEach
@@ -62,6 +74,11 @@ public class FileTests {
         if(!response.ok()) {
             System.err.println("Cleanup failed for " + testCollectionName + ": " + response.status() + " - " + response.text());
         }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        extent.flush();
     }
 
     @Test

@@ -2,6 +2,9 @@
 
 package com.strangequark.vaultservice;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,6 +36,9 @@ public class VaultTests {
 
     private final String ENV_TEST_FILE = "testEnvFile.env";
 
+    private static ExtentReports extent;
+    private ExtentTest test;
+
     @BeforeAll
     public static void beforeAll() {
         playwright = Playwright.create();
@@ -41,6 +47,10 @@ public class VaultTests {
         vaultFunctions = new VaultFunctions(apiRequestContext
                 , authFunctions // Integration line: Auth
         );
+
+        ExtentSparkReporter htmlReporter = new ExtentSparkReporter("test-results/vault-report.html");
+        extent = new ExtentReports();
+        extent.attachReporter(htmlReporter);
     }
 
     @BeforeEach
@@ -66,6 +76,8 @@ public class VaultTests {
             response = vaultFunctions.addVariable(testServiceName, testEnvironmentName, testVariableName, testVariableValue);
             assertTrue(response.ok(), "Add variable setup failed: " + response.status() + " - " + response.text());
         }
+
+        test = extent.createTest(testInfo.getDisplayName());
     }
 
     @AfterEach
@@ -79,6 +91,11 @@ public class VaultTests {
         if(!response.ok()) {
             System.err.println("Cleanup failed for " + testServiceName + ": " + response.status() + " - " + response.text());
         }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        extent.flush();
     }
 
     @Test
