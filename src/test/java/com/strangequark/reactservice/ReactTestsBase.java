@@ -2,13 +2,12 @@
 
 package com.strangequark.reactservice;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -18,6 +17,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(ExtentTestWatcher.class)
 public class ReactTestsBase {
     public Playwright playwright;
     public Page page;
@@ -26,8 +26,6 @@ public class ReactTestsBase {
     public final Locator.WaitForOptions WAIT_FOR_VISIBLE = new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE);
     public final Locator.WaitForOptions WAIT_FOR_DETACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED);
     public final Locator.WaitForOptions WAIT_FOR_ATTACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED);
-    private static ExtentReports extent;
-    private ExtentTest test;
 
     public static APIRequestContext apiRequestContext; // Integration function start: Auth
     public AuthFunctions authFunctions;
@@ -70,15 +68,11 @@ public class ReactTestsBase {
         envFileName = "testEnvFile.env";
         envFilePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + envFileName).toURI());
         // Integration function end: Vault
-
-        ExtentSparkReporter htmlReporter = new ExtentSparkReporter("test-results/react-report.html");
-        extent = new ExtentReports();
-        extent.attachReporter(htmlReporter);
     }
 
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
-        browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false));
+        browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(true));
         page = browser.newPage();
         // Integration function start: Auth
         if(testInfo.getTestMethod().get().getName().startsWith("user")) {
@@ -92,8 +86,6 @@ public class ReactTestsBase {
         testVariableKey = "testKey_" + UUID.randomUUID();
         testVariableValue = "testValue_" + UUID.randomUUID();
         // Integration function end: Vault
-
-        test = extent.createTest(testInfo.getDisplayName());
     }
 
     @AfterEach
@@ -105,10 +97,5 @@ public class ReactTestsBase {
             authFunctions.deleteUser(username, email, password);
             assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
         }// Integration function end: Auth
-    }
-
-    @AfterAll
-    static void afterAll() {
-        extent.flush();
     }
 }
