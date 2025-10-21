@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.FormData;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.utility.EnvUtility;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ public class FileFunctions {
     public String testEmail;
     public String testPassword;// Integration function end: Auth
 
-    public static final String FILE_BASE_URL = "http://localhost:6010/api/file";
+    public static final String FILE_BASE_URL = EnvUtility.getEnvVar("FILE_BASE_URL");
 
     public FileFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;

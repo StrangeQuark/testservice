@@ -7,6 +7,7 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.strangequark.utility.EnvUtility;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,12 +16,15 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReactFunctions {
+    public static final String REACT_BASE_URL = EnvUtility.getEnvVar("REACT_BASE_URL");
+    public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL");
+
     public ReactFunctions() {
 
     }
 
     public void navigateToHomePage(Page page) {
-        page.navigate("localhost:6080/");
+        page.navigate(REACT_BASE_URL + "/");
     }
 
     public void handleNextAlert(Page page, boolean accept) {
@@ -33,11 +37,11 @@ public class ReactFunctions {
     }
     // Integration function start: Auth
     public void navigateToLogin(Page page) {
-        page.navigate("localhost:6080/login");
+        page.navigate(REACT_BASE_URL + "/login");
     }
 
     public void navigateToRegister(Page page) {
-        page.navigate("localhost:6080/register");
+        page.navigate(REACT_BASE_URL + "/register");
     }
 
     public void fillAndSubmitRegisterForm(Page page, String username, String email, String password) {
@@ -59,7 +63,7 @@ public class ReactFunctions {
 
         page.click("id=submit-button");
 
-        page.waitForURL("http://localhost:6080/");
+        page.waitForURL(REACT_BASE_URL + "/");
     }
 
     public void fillAndSubmitPasswordResetForm(Page page, String username) {
@@ -112,7 +116,7 @@ public class ReactFunctions {
     }
 
     public void navigateToUserSettings(Page page) {
-        page.navigate("localhost:6080/settings");
+        page.navigate(REACT_BASE_URL + "/settings");
     }
 
     public void clickEditAndSubmitUpdateUsername(Page page, String username, String password) {
@@ -179,15 +183,15 @@ public class ReactFunctions {
     // Integration function end: Auth
     // Integration function start: Email
     public void navigateToPasswordReset(Page page) {
-        page.navigate("localhost:6080/password-reset");
+        page.navigate(REACT_BASE_URL + "/password-reset");
     }
 
     public void navigateToNewPassword(Page page) {
-        page.navigate("localhost:6080/new-password");
+        page.navigate(REACT_BASE_URL + "/new-password");
     }
 
     public void navigateToMailbox(Page page) {
-        page.navigate("localhost:1080");
+        page.navigate(MAILDEV_BASE_URL);
     }
 
     public void clickPasswordResetEmail(Page page, String email) {
@@ -217,7 +221,7 @@ public class ReactFunctions {
     }
 
     public void navigateToFiles(Page page) {
-        page.navigate("localhost:6080/files");
+        page.navigate(REACT_BASE_URL + "/files");
     }
 
     public void fillAndSubmitCreateCollectionForm(Page page, String collectionName) {
@@ -279,7 +283,7 @@ public class ReactFunctions {
     }
 
     public void navigateToVault(Page page) {
-        page.navigate("localhost:6080/vault");
+        page.navigate(REACT_BASE_URL + "/vault");
     }
 
     public void fillAndSubmitCreateServiceForm(Page page, String serviceName) {

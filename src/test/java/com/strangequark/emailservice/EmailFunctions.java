@@ -9,6 +9,7 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.utility.EnvUtility;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class EmailFunctions {
     public String testEmail;
     public String testPassword;// Integration function end: Auth
 
-    public static final String EMAIL_BASE_URL = "http://localhost:6005/api/email";
+    public static final String EMAIL_BASE_URL = EnvUtility.getEnvVar("EMAIL_BASE_URL");
 
     public EmailFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;

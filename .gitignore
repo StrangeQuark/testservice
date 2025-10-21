@@ -5,9 +5,6 @@ test-results/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### Reactservice E2E screenshots
-testservice/src/test/java/com/strangequark/reactservice/screenshots/*.png
-
 ### STS ###
 .apt_generated
 .classpath
