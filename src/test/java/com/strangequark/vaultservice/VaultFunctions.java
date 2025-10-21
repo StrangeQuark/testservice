@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.FormData;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.utility.EnvUtility;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -26,7 +27,7 @@ public class VaultFunctions {
     public String testEmail;
     public String testPassword;// Integration function end: Auth
 
-    public static final String VAULT_BASE_URL = "http://localhost:6020/api/vault";
+    public static final String VAULT_BASE_URL = EnvUtility.getEnvVar("VAULT_BASE_URL");
 
     public VaultFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;

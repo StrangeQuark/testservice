@@ -8,6 +8,7 @@ import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.utility.AuthUtility;
+import com.strangequark.utility.EnvUtility;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthFunctions {
-    public static final String AUTH_BASE_URL = "http://localhost:6001/api/auth";
+    public static final String AUTH_BASE_URL = EnvUtility.getEnvVar("AUTH_BASE_URL");
 
     private final APIRequestContext apiRequestContext;
     private final AuthUtility authUtility;

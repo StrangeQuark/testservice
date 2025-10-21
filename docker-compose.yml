@@ -1,0 +1,18 @@
+services:
+  test-service:
+    build: .
+    networks:
+      - shared-network
+    container_name: test-service
+    environment:
+      - DUMMY_VAR=dummyvar
+      - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST} # Integration line: Auth
+      - AUTH_BOOTSTRAP_SECRET_KEY=${AUTH_BOOTSTRAP_SECRET_KEY} # Integration line: Auth
+      - AUTH_BASE_URL=${AUTH_BASE_URL} # Integration line: Auth
+      - EMAIL_BASE_URL=${EMAIL_BASE_URL} # Integration line: Email
+      - REACT_BASE_URL=${REACT_BASE_URL} # Integration line: React
+      - FILE_BASE_URL=${FILE_BASE_URL} # Integration line: File
+      - VAULT_BASE_URL=${VAULT_BASE_URL} # Integration line: Vault
+networks:
+  shared-network:
+    external: true
