@@ -74,6 +74,13 @@ public class ReactTestsBase {
     public void beforeEach(TestInfo testInfo) {
         browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(true));
         page = browser.newPage();
+
+        page.onConsoleMessage(msg -> System.out.println(msg.text()));
+        page.onRequestFailed(req -> {
+            if (!req.url().contains("http://maildev:1080/socket.io/"))
+                System.out.println("Request failed: " + req.url());
+        });
+
         // Integration function start: Auth
         if(testInfo.getTestMethod().get().getName().startsWith("user")) {
             username = "test_" + UUID.randomUUID();
