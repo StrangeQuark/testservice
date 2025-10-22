@@ -93,7 +93,10 @@ public class ReactVaultTests extends ReactTestsBase {
         // Spy on clipboard to avoid permission issues
         page.evaluate("""
             () => { 
-                window.__copiedText = ''; 
+                window.__copiedText = '';
+                if (!navigator.clipboard) {
+                    navigator.clipboard = {};
+                }
                 navigator.clipboard.writeText = text => { 
                     window.__copiedText = text;
                     return Promise.resolve();

@@ -10,6 +10,7 @@ services:
       - AUTH_BOOTSTRAP_SECRET_KEY=${AUTH_BOOTSTRAP_SECRET_KEY} # Integration line: Auth
       - AUTH_BASE_URL=${AUTH_BASE_URL} # Integration line: Auth
       - EMAIL_BASE_URL=${EMAIL_BASE_URL} # Integration line: Email
+      - MAILDEV_BASE_URL=${MAILDEV_BASE_URL} # Integration line: Email
       - REACT_BASE_URL=${REACT_BASE_URL} # Integration line: React
       - FILE_BASE_URL=${FILE_BASE_URL} # Integration line: File
       - VAULT_BASE_URL=${VAULT_BASE_URL} # Integration line: Vault
