@@ -5,6 +5,7 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.utility.AuthUtility;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,8 @@ public class ReactTestsBase {
     public AuthFunctions authFunctions;
     public String username;
     public String email;
-    public String password;// Integration function end: Auth
+    public String password;
+    public AuthUtility authUtility;// Integration function end: Auth
     public String collectionName;// Integration function start: File
     public String textFileName;
     public Path textFilePath;
@@ -55,6 +57,7 @@ public class ReactTestsBase {
         reactFunctions = new ReactFunctions();
         apiRequestContext = playwright.request().newContext(); // Integration line: Auth
         authFunctions = new AuthFunctions(apiRequestContext);// Integration line: Auth
+        authUtility = new AuthUtility(apiRequestContext);// Integration line: Auth
         textFileName = "testUploadFile.txt";// Integration function start: File
         textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());
         audioFileName = "testAudioFile.mp3";
@@ -102,7 +105,7 @@ public class ReactTestsBase {
         // Integration function start: Auth
         if(testInfo.getTestMethod().get().getName().startsWith("user")) {
             authFunctions.deleteUser(username, email, password);
-            assertFalse(authFunctions.getUserId(username, password).ok(), "User cleanup failed in React service register test");
+            assertFalse(authFunctions.getUserId(username, authUtility.authenticateServiceAccount()).ok(), "User cleanup failed in React service register test");
         }// Integration function end: Auth
     }
 }
