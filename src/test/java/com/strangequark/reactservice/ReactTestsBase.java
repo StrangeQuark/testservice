@@ -5,7 +5,7 @@ package com.strangequark.reactservice;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
-import com.strangequark.utility.AuthUtility;
+import com.strangequark.utility.AuthUtility; // Integration line: Auth
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
