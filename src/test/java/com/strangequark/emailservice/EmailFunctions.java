@@ -42,11 +42,11 @@ public class EmailFunctions {
         return apiRequestContext.get(EMAIL_BASE_URL + "/health");
     }
 
-    public APIResponse sendEmail(String recipient, String sender, String email, String subject) {
+    public APIResponse sendEmail(String recipient, String sender, String body, String subject) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
         requestBody.put("sender", sender);
-        requestBody.put("email", email);
+        requestBody.put("body", body);
         requestBody.put("subject", subject);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody)
@@ -54,36 +54,41 @@ public class EmailFunctions {
         );
     }
 
-    public APIResponse sendEmailWithToken(String recipient, String sender, String email, String subject) {
-        Map<String, String> requestBody = new HashMap<>();
+    public APIResponse sendEmailWithToken(String recipient, String sender, String body, String subject) {
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
         requestBody.put("sender", sender);
-        requestBody.put("email", email);
+        requestBody.put("body", body);
         requestBody.put("subject", subject);
+        requestBody.put("includeToken", true);
 
-        return apiRequestContext.post(EMAIL_BASE_URL + "/send-email-with-token", RequestOptions.create().setData(requestBody)
+        return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
-    public APIResponse sendRegisterEmail(String recipient, String sender, String subject) {
-        Map<String, String> requestBody = new HashMap<>();
+    public APIResponse sendRegisterEmail(String recipient, String sender) {
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
         requestBody.put("sender", sender);
-        requestBody.put("subject", subject);
+        requestBody.put("includeToken", true);
+        requestBody.put("templateName", "USER_REGISTER");
+        requestBody.put("templateVariables", Map.of("link", "http://react-service/confirm-email"));
 
-        return apiRequestContext.post(EMAIL_BASE_URL + "/send-register-email", RequestOptions.create().setData(requestBody)
+        return apiRequestContext.post(EMAIL_BASE_URL + "/send-template-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
-    public APIResponse sendPasswordResetEmail(String recipient, String sender, String subject) {
-        Map<String, String> requestBody = new HashMap<>();
+    public APIResponse sendPasswordResetEmail(String recipient, String sender) {
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
         requestBody.put("sender", sender);
-        requestBody.put("subject", subject);
+        requestBody.put("includeToken", true);
+        requestBody.put("templateName", "USER_PASSWORD_RESET");
+        requestBody.put("templateVariables", Map.of("link", "http://react-service/new-password"));
 
-        return apiRequestContext.post(EMAIL_BASE_URL + "/send-password-reset-email", RequestOptions.create().setData(requestBody)
+        return apiRequestContext.post(EMAIL_BASE_URL + "/send-template-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
@@ -107,12 +112,14 @@ public class EmailFunctions {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Register user in Email enable user test failed: " + response.status() + " - " + response.text());
 
-        Map<String, String> requestBody = new HashMap<>();
+        Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("recipient", testEmail);
         requestBody.put("sender", "sender@email.com");
-        requestBody.put("subject", "Test subject");
+        requestBody.put("includeToken", true);
+        requestBody.put("templateName", "USER_REGISTER");
+        requestBody.put("templateVariables", Map.of("link", "http://react-service/confirm-email"));
 
-        response = apiRequestContext.post(EmailFunctions.EMAIL_BASE_URL + "/send-register-email", RequestOptions.create().setData(requestBody)
+        response = apiRequestContext.post(EmailFunctions.EMAIL_BASE_URL + "/send-template-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
         assertTrue(response.ok(), "Send register email test failed: " + response.status() + " - " + response.text());
 
