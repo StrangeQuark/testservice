@@ -96,7 +96,7 @@ public class ReactFunctions {
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
-        Locator confirmLink = emailFrame.getByText("confirm-email?token=");
+        Locator confirmLink = emailFrame.getByText("Confirm registration");
         confirmLink.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
 
         String confirmUrl = confirmLink.getAttribute("href");
@@ -199,7 +199,7 @@ public class ReactFunctions {
                 .filter(new Locator.FilterOptions().setHasText(email));
 
         Locator parent = subline.locator("..")
-                .filter(new Locator.FilterOptions().setHasText("Password reset"));
+                .filter(new Locator.FilterOptions().setHasText("Reset your password"));
 
         parent.click(new Locator.ClickOptions().setTimeout(10000));
 
