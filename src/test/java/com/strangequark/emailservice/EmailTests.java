@@ -52,13 +52,13 @@ public class EmailTests {
 
     @Test
     public void sendRegisterEmailTest() {
-        APIResponse response = emailFunctions.sendRegisterEmail("recipient@email.com", "sender@email.com", "Test subject");
+        APIResponse response = emailFunctions.sendRegisterEmail("recipient@email.com", "sender@email.com");
         assertTrue(response.ok(), "Send register email test failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void sendPasswordResetEmailTest() {
-        APIResponse response = emailFunctions.sendPasswordResetEmail("recipient@email.com", "sender@email.com", "Test subject");
+        APIResponse response = emailFunctions.sendPasswordResetEmail("recipient@email.com", "sender@email.com");
         assertTrue(response.ok(), "Send password reset email test failed: " + response.status() + " - " + response.text());
     }
 
