@@ -10,6 +10,8 @@ import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
@@ -41,6 +43,29 @@ public class EmailTests {
                 "Test email", "Test subject");
 
         assertTrue(response.ok(), "Send email test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void getTemplateEmailTest() {
+        APIResponse response = emailFunctions.getTemplateEmail("USER_REGISTER");
+
+        assertTrue(response.ok(), "Get template email test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void sendTemplateEmailTest() {
+        APIResponse response = emailFunctions.sendTemplateEmail("recipient@email.com", "sender@email.com",
+                true, "USER_REGISTER", Map.of("link", "http://testservice.com"));
+
+        assertTrue(response.ok(), "Send template email test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void createTemplateEmailTest() {
+        APIResponse response = emailFunctions.createTemplateEmail("Test template body", "Test template subject",
+                "TEST_SERVICE_TEMPLATE_NAME");
+
+        assertTrue(response.ok(), "Create template email test failed: " + response.status() + " - " + response.text());
     }
 
     @Test
