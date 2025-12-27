@@ -54,6 +54,37 @@ public class EmailFunctions {
         );
     }
 
+    public APIResponse getTemplateEmail(String templateName) {
+        return apiRequestContext.get(EMAIL_BASE_URL + "/get-template-email?templateName=" + templateName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse sendTemplateEmail(String recipient, String sender, boolean includeToken, String templateName,
+                                         Map<String, String> templateVariables) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("recipient", recipient);
+        requestBody.put("sender", sender);
+        requestBody.put("includeToken", includeToken);
+        requestBody.put("templateName", templateName);
+        requestBody.put("templateVariables", templateVariables);
+
+        return apiRequestContext.post(EMAIL_BASE_URL + "/send-template-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse createTemplateEmail(String body, String subject, String templateName) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("body", body);
+        requestBody.put("subject", subject);
+        requestBody.put("templateName", templateName);
+
+        return apiRequestContext.post(EMAIL_BASE_URL + "/create-template-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+        );
+    }
+
     public APIResponse sendEmailWithToken(String recipient, String sender, String body, String subject) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
