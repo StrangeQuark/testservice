@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReactFunctions {
     public static final String REACT_BASE_URL = EnvUtility.getEnvVar("REACT_BASE_URL");
-    public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL");
+    public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL"); // Integration line: Email
 
     public ReactFunctions() {
 
