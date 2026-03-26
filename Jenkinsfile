@@ -1,5 +1,10 @@
 pipeline {
-    agent { label 'Host PC' }
+    agent { label 'linux-agent' }
+
+    environment {
+        VAULT_URL = credentials('VAULT_URL') // Integration line: Vault
+        CICD_TOKEN = credentials('CICD_TOKEN') // Integration line: Vault
+    }
 
     stages {
         // Integration function start: Vault
@@ -7,8 +12,11 @@ pipeline {
             steps {
                 script {
                     def response = httpRequest(
-                        url: 'http://localhost:6020/api/vault/getVariablesByEnvironment/testservice/e3',
+                        url: VAULT_URL + '/api/vault/cicd/testservice/e3',
                         httpMode: 'GET',
+                        customHeaders: [
+                            [name: 'X-CICD-TOKEN', value: CICD_TOKEN, maskValue: true]
+                        ],
                         acceptType: 'APPLICATION_JSON'
                     )
 
@@ -19,8 +27,8 @@ pipeline {
                         envFileContent += "${entry.key}=${entry.value}\n"
                     }
 
-                    writeFile file: '.env', text: envFileContent
-                    echo "Environment variables written to .env"
+                    writeFile file: 'testservice.env', text: envFileContent
+                    echo "Environment variables written to testservice.env"
                 }
             }
         }
@@ -29,14 +37,14 @@ pipeline {
             steps {
                 script {
                     try {
-                        bat "docker-compose --env-file .env up --build"
+                        sh "docker compose --env-file testservice.env up --build"
                     } catch (ex) {
                         echo "Unexpected failure: ${ex.getMessage()}"
-                        bat "docker-compose down"
+                        sh "docker compose down"
                         error("Deployment crashed.")
                     } finally {
                         // Ensure containers are cleaned up
-                        bat "docker-compose down"
+                        sh "docker compose down"
                     }
                 }
             }
@@ -56,9 +64,11 @@ pipeline {
         }
     }
 
-     post {
+    post {
         always {
-            bat "docker-compose down -v"
+            sh "rm -f testservice.env"
+            echo "Cleaned up testservice.env"
+            sh "docker compose down -v"
         }
     }
 }
