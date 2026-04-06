@@ -1,0 +1,61 @@
+# Integration file: GHA
+name: TestService CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: [self-hosted, linux-agent]
+
+    env:
+      VAULT_URL: ${{ secrets.VAULT_URL }} # Integration line: Vault
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }} # Integration line: Vault
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        # Integration function start: Vault
+      - name: Retrieve Env Vars
+        run: |
+          echo "Requesting environment variables from Vault..."
+
+          curl -s \
+            -H "X-CICD-TOKEN: $CICD_TOKEN" \
+            "$VAULT_URL/api/vault/cicd/testservice/e3" \
+            | tr -d '{}' \
+            | tr ',' '\n' \
+            | sed 's/"//g' \
+            | sed 's/:/=/g' \
+            > testservice.env
+
+          echo "Environment variables written to testservice.env"
+        # Integration function end: Vault
+      - name: Deploy & Test
+        run: |
+          set -e
+          docker compose --env-file testservice.env up --build || {
+            echo "Deployment crashed."
+            docker compose down
+            exit 1
+          }
+
+      - name: Shutdown containers
+        if: always()
+        run: |
+          docker compose down
+
+      - name: Upload HTML Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: testservice/test-results/report.html
+          if-no-files-found: ignore
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f testservice.env
+          echo "Cleaned up testservice.env"
+          docker compose down -v
