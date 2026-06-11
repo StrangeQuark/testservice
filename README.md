@@ -55,7 +55,7 @@ It is fully compatible with each service, and is meant to be initialized via the
 <br><br>
 
 ## License
-This project is licensed under the GNU General Public License. See `LICENSE.md` for details.
+This project is licensed under the Apache License 2.0. See `LICENSE` for details.
 <br><br>
 
 ## Contributing
