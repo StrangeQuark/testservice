@@ -167,6 +167,14 @@ public class ReactAuthTests extends ReactTestsBase {
 
         messageDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(messageDiv.isVisible(), "Success message div should be visible after clicking the register email link");
+
+        reactFunctions.navigateToLogin(page);
+        reactFunctions.fillAndSubmitLoginForm(page, username, password);
+
+        Locator usernameButton = page.getByText(username);
+
+        usernameButton.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(usernameButton.isVisible(), "User should be able to log in after confirming registration");
     }
 
     @Test
@@ -189,6 +197,14 @@ public class ReactAuthTests extends ReactTestsBase {
         successDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(successDiv.isVisible(), "Success message div should be visible after updating the user's password");
         assertEquals("Your password has been successfully reset", successDiv.innerText(), "The success message div text is incorrect");
+
+        reactFunctions.navigateToLogin(page);
+        reactFunctions.fillAndSubmitLoginForm(page, username, password);
+
+        Locator usernameButton = page.getByText(username);
+
+        usernameButton.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(usernameButton.isVisible(), "User should be able to log in with the reset password");
     }
     // Integration function end: Email
 }
