@@ -52,6 +52,14 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount(clientId)));
     }
 
+    public APIResponse enableUserWithAccessToken(String email, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", email);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/user/enable-user", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     public APIResponse disableUser(String username, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
