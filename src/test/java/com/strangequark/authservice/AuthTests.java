@@ -79,6 +79,16 @@ public class AuthTests {
     }// Integration function end: Email
 
     @Test
+    public void enableUserRejectsNonEmailServiceAccountTest() {
+        APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.enableUser(testEmail, "test");
+        assertFalse(response.ok(), "Non-email service account should not enable users");
+        assertEquals(403, response.status());
+    }
+
+    @Test
     public void authenticateTest() {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());

@@ -13,6 +13,7 @@ import java.util.Map;
 public class AuthUtility {
     private final APIRequestContext apiRequestContext;
     private final String SERVICE_SECRET_TEST;
+    private final String SERVICE_SECRET_EMAIL;
     private final String AUTH_BOOTSTRAP_SECRET_KEY;
 
     public AuthUtility(APIRequestContext apiRequestContext) {
@@ -21,15 +22,21 @@ public class AuthUtility {
         // Attempt to get the TestService service secret for auth integrations
         SERVICE_SECRET_TEST = EnvUtility.getEnvVar("SERVICE_SECRET_TEST");
 
+        SERVICE_SECRET_EMAIL = EnvUtility.getEnvVar("SERVICE_SECRET_EMAIL");
+
         // Attempt to get the AuthService bootstrap secret key for bootstrapSuperUserTest
         AUTH_BOOTSTRAP_SECRET_KEY = EnvUtility.getEnvVar("AUTH_BOOTSTRAP_SECRET_KEY");
     }
 
     public String authenticateServiceAccount() {
+        return authenticateServiceAccount("test");
+    }
+
+    public String authenticateServiceAccount(String clientId) {
         try {
             Map<String, String> requestBody = new HashMap<>();
-            requestBody.put("clientId", "test");
-            requestBody.put("clientPassword", SERVICE_SECRET_TEST);
+            requestBody.put("clientId", clientId);
+            requestBody.put("clientPassword", getServiceSecret(clientId));
 
             APIResponse response = apiRequestContext.post(AuthFunctions.AUTH_BASE_URL + "/service-account/authenticate",
                     RequestOptions.create().setData(requestBody));
@@ -50,8 +57,10 @@ public class AuthUtility {
         return AUTH_BOOTSTRAP_SECRET_KEY;
     }
 
-    public String getServiceSecretTest(String clientId) {
+    public String getServiceSecret(String clientId) {
+        if(clientId.equals("email"))
+            return SERVICE_SECRET_EMAIL;
+
         return SERVICE_SECRET_TEST;
     }
 }
-

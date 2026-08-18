@@ -7,6 +7,7 @@ services:
     environment:
       - DUMMY_VAR=dummyvar
       - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST} # Integration line: Auth
+      - SERVICE_SECRET_EMAIL=${SERVICE_SECRET_EMAIL} # Integration line: Auth
       - AUTH_BOOTSTRAP_SECRET_KEY=${AUTH_BOOTSTRAP_SECRET_KEY} # Integration line: Auth
       - AUTH_BASE_URL=${AUTH_BASE_URL} # Integration line: Auth
       - EMAIL_BASE_URL=${EMAIL_BASE_URL} # Integration line: Email
