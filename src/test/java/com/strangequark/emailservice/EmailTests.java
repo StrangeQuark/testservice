@@ -2,16 +2,19 @@
 
 package com.strangequark.emailservice;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
@@ -19,16 +22,12 @@ public class EmailTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
     private static EmailFunctions emailFunctions;
-    private static AuthFunctions authFunctions; // Integration line: Auth
 
     @BeforeAll
     public static void beforeAll() {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
-        authFunctions = new AuthFunctions(apiRequestContext); // Integration line: Auth
-        emailFunctions = new EmailFunctions(apiRequestContext
-            , authFunctions // Integration line: Auth
-        );
+        emailFunctions = new EmailFunctions(apiRequestContext);
     }
 
     @Test
@@ -58,48 +57,84 @@ public class EmailTests {
                 true, "USER_REGISTER", Map.of("link", "http://testservice.com"));
 
         assertTrue(response.ok(), "Send template email test failed: " + response.status() + " - " + response.text());
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertFalse(jsonObject.has("token"), "System template response must not include a token");
     }
 
     @Test
     public void createTemplateEmailTest() {
+        String templateName = "TEST_SERVICE_TEMPLATE_" + UUID.randomUUID();
         APIResponse response = emailFunctions.createTemplateEmail("Test template body", "Test template subject",
-                "TEST_SERVICE_TEMPLATE_NAME");
+                templateName, "INVITATION");
 
         assertTrue(response.ok(), "Create template email test failed: " + response.status() + " - " + response.text());
+
+        response = emailFunctions.deleteTemplateEmail(templateName);
+        assertTrue(response.ok(), "Template cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void sendEmailWithTokenTest() {
         APIResponse response = emailFunctions.sendEmailWithToken("recipient@email.com", "sender@email.com",
                 "Test email", "Test subject");
-        assertTrue(response.ok(), "Send email with token test failed: " + response.status() + " - " + response.text());
+        assertFalse(response.ok(), "Generic email token request should be rejected");
     }
 
     @Test
-    public void sendRegisterEmailTest() {
-        APIResponse response = emailFunctions.sendRegisterEmail("recipient@email.com", "sender@email.com");
-        assertTrue(response.ok(), "Send register email test failed: " + response.status() + " - " + response.text());
+    public void sendCustomTemplateEmailWithTokenTest() {
+        String templateName = "TEST_SERVICE_TEMPLATE_" + UUID.randomUUID();
+
+        APIResponse response = emailFunctions.createTemplateEmail("Test template body [[confirmationToken]]",
+                "Test template subject", templateName, "INVITATION");
+        assertTrue(response.ok(), "Custom template creation failed: " + response.status() + " - " + response.text());
+
+        response = emailFunctions.sendTemplateEmail("recipient@email.com", "sender@email.com",
+                true, templateName, Map.of());
+        assertTrue(response.ok(), "Custom token template send failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        assertTrue(jsonObject.has("token"), "Custom template response should include its token");
+
+        response = emailFunctions.deleteTemplateEmail(templateName);
+        assertTrue(response.ok(), "Custom template cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
-    public void sendPasswordResetEmailTest() {
-        APIResponse response = emailFunctions.sendPasswordResetEmail("recipient@email.com", "sender@email.com");
-        assertTrue(response.ok(), "Send password reset email test failed: " + response.status() + " - " + response.text());
+    public void updateTemplateEmailTest() {
+        String templateName = "TEST_SERVICE_TEMPLATE_" + UUID.randomUUID();
+
+        APIResponse response = emailFunctions.createTemplateEmail("Original body", "Original subject",
+                templateName, "INVITATION");
+        assertTrue(response.ok(), "Template creation failed: " + response.status() + " - " + response.text());
+
+        response = emailFunctions.updateTemplateEmail("Updated body", "Updated subject", templateName);
+        assertTrue(response.ok(), "Template update failed: " + response.status() + " - " + response.text());
+
+        response = emailFunctions.deleteTemplateEmail(templateName);
+        assertTrue(response.ok(), "Template cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
-    public void confirmTokenTest() {
-        APIResponse response = emailFunctions.confirmToken();
-        assertTrue(response.ok(), "Confirm email token test failed: " + response.status() + " - " + response.text());
-    }
-    // Integration function start: Auth
-    @Test
-    public void enableUserTest() {
-        APIResponse response = emailFunctions.enableUser();
-        assertTrue(response.ok(), "Email enable user test failed: " + response.status() + " - " + response.text());
+    public void deleteSystemTemplateEmailTest() {
+        APIResponse response = emailFunctions.deleteTemplateEmail("USER_REGISTER");
 
-        // Cleanup the user that was created
-        response = authFunctions.deleteUser(emailFunctions.testUsername, emailFunctions.testEmail, emailFunctions.testPassword);
-        assertTrue(response.ok(), "Email enable user test cleanup failed: " + response.status() + " - " + response.text());
-    }// Integration function end: Auth
+        assertFalse(response.ok(), "System templates must not be deleted");
+    }
+
+    @Test
+    public void createMultiplePasswordResetTemplatesTest() {
+        String firstTemplateName = "PASSWORD_RESET_A_" + UUID.randomUUID();
+        String secondTemplateName = "PASSWORD_RESET_B_" + UUID.randomUUID();
+
+        APIResponse response = emailFunctions.createTemplateEmail("Site A reset [[confirmationToken]]",
+                "Reset Site A password", firstTemplateName, "PASSWORD_RESET");
+        assertTrue(response.ok(), "First reset template creation failed: " + response.status() + " - " + response.text());
+
+        response = emailFunctions.createTemplateEmail("Site B reset [[confirmationToken]]",
+                "Reset Site B password", secondTemplateName, "PASSWORD_RESET");
+        assertTrue(response.ok(), "Second reset template creation failed: " + response.status() + " - " + response.text());
+
+        emailFunctions.deleteTemplateEmail(firstTemplateName);
+        emailFunctions.deleteTemplateEmail(secondTemplateName);
+    }
 }
