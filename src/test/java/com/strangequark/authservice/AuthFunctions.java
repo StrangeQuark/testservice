@@ -41,11 +41,15 @@ public class AuthFunctions {
     }
 
     public APIResponse enableUser(String email) {
+        return enableUser(email, "email");
+    }
+
+    public APIResponse enableUser(String email, String clientId) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("email", email);
 
         return apiRequestContext.post(AUTH_BASE_URL + "/user/enable-user", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()));
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount(clientId)));
     }
 
     public APIResponse disableUser(String username, String accessToken) {
@@ -155,7 +159,7 @@ public class AuthFunctions {
     public APIResponse serviceAccountAuthenticate(String clientId) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("clientId", clientId);
-        requestBody.put("clientPassword", authUtility.getServiceSecretTest(clientId));
+        requestBody.put("clientPassword", authUtility.getServiceSecret(clientId));
 
         return apiRequestContext.post(AUTH_BASE_URL + "/service-account/authenticate", RequestOptions.create().setData(requestBody));
     }

@@ -92,7 +92,8 @@ public class ReactFunctions {
         fillAndSubmitRegisterForm(page, username, email, password);
         // Integration function start: Email
         navigateToMailbox(page);
-        page.getByText(email).click();
+        page.getByPlaceholder("Search emails...").fill(email);
+        page.getByText("Activate your account", new Page.GetByTextOptions().setExact(true)).click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
@@ -195,13 +196,8 @@ public class ReactFunctions {
     }
 
     public void clickPasswordResetEmail(Page page, String email) {
-        Locator subline = page.locator("span.title-subline.ng-binding")
-                .filter(new Locator.FilterOptions().setHasText(email));
-
-        Locator parent = subline.locator("..")
-                .filter(new Locator.FilterOptions().setHasText("Reset your password"));
-
-        parent.click(new Locator.ClickOptions().setTimeout(10000));
+        page.getByPlaceholder("Search emails...").fill(email);
+        page.getByText("Reset your password", new Page.GetByTextOptions().setExact(true)).click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
