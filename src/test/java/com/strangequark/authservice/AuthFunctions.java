@@ -52,6 +52,14 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount(clientId)));
     }
 
+    public APIResponse enableUserWithAccessToken(String email, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", email);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/user/enable-user", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     public APIResponse disableUser(String username, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
@@ -146,14 +154,13 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    public APIResponse bootstrapSuperUser(String username, String email, String password) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("username", username);
-        requestBody.put("email", email);
-        requestBody.put("password", password);
+    public String authenticateInitialSuperUser() {
+        APIResponse response = authenticate(authUtility.getInitialSuperUsername(),
+                authUtility.getInitialSuperPassword());
 
-        return apiRequestContext.post(AUTH_BASE_URL + "/internal/bootstrap", RequestOptions.create().setData(requestBody)
-                .setHeader("X-BOOTSTRAP-SECRET", authUtility.getAuthBootstrapSecretKey()));
+        response = serveAccessToken(extractJwt(response));
+
+        return extractJwt(response);
     }
 
     public APIResponse serviceAccountAuthenticate(String clientId) {
