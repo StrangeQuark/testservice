@@ -99,43 +99,23 @@ public class AuthTests {
 
     @Test
     public void enableUserAllowsSuperUserTest() {
-        APIResponse response = authFunctions.bootstrapSuperUser(testUsername, testEmail, testPassword);
-        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
+        String superAccessToken = authFunctions.authenticateInitialSuperUser();
 
-        response = authFunctions.authenticate(testUsername, testPassword);
-        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
-        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
-        String superAccessToken = authFunctions.extractJwt(response);
-
-        String targetUsername = "test_" + UUID.randomUUID();
-        String targetEmail = targetUsername + "@email.com";
-        String targetPassword = UUID.randomUUID().toString();
-        response = authFunctions.register(targetUsername, targetEmail, targetPassword);
+        APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
 
-        response = authFunctions.enableUserWithAccessToken(targetEmail, superAccessToken);
+        response = authFunctions.enableUserWithAccessToken(testEmail, superAccessToken);
         assertTrue(response.ok(), "SUPER user should enable users: " + response.status() + " - " + response.text());
-
-        response = authFunctions.deleteUser(targetUsername, targetEmail, targetPassword);
-        assertTrue(response.ok(), "Target user cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void enableUserAllowsAdminUserTest() {
-        APIResponse response = authFunctions.bootstrapSuperUser(testUsername, testEmail, testPassword);
-        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
-
-        response = authFunctions.authenticate(testUsername, testPassword);
-        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
-        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
-        String superAccessToken = authFunctions.extractJwt(response);
+        String superAccessToken = authFunctions.authenticateInitialSuperUser();
 
         String adminUsername = "test_" + UUID.randomUUID();
         String adminEmail = adminUsername + "@email.com";
         String adminPassword = UUID.randomUUID().toString();
-        response = authFunctions.register(adminUsername, adminEmail, adminPassword);
+        APIResponse response = authFunctions.register(adminUsername, adminEmail, adminPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
         response = authFunctions.enableUser(adminEmail);
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
@@ -149,19 +129,14 @@ public class AuthTests {
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
         String adminAccessToken = authFunctions.extractJwt(response);
 
-        String targetUsername = "test_" + UUID.randomUUID();
-        String targetEmail = targetUsername + "@email.com";
-        String targetPassword = UUID.randomUUID().toString();
-        response = authFunctions.register(targetUsername, targetEmail, targetPassword);
+        response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
 
-        response = authFunctions.enableUserWithAccessToken(targetEmail, adminAccessToken);
+        response = authFunctions.enableUserWithAccessToken(testEmail, adminAccessToken);
         assertTrue(response.ok(), "ADMIN user should enable users: " + response.status() + " - " + response.text());
 
         response = authFunctions.deleteUser(adminUsername, adminEmail, adminPassword);
         assertTrue(response.ok(), "Admin user cleanup failed: " + response.status() + " - " + response.text());
-        response = authFunctions.deleteUser(targetUsername, targetEmail, targetPassword);
-        assertTrue(response.ok(), "Target user cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
@@ -271,16 +246,12 @@ public class AuthTests {
 
     @Test
     public void addAuthorizationsToUserTest() {
-        APIResponse response = authFunctions.bootstrapSuperUser(testUsername, testEmail, testPassword);
-        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
+        APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        response = authFunctions.enableUser(testEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
-        response = authFunctions.authenticate(testUsername, testPassword);
-        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
-        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
-
-        String accessToken = authFunctions.extractJwt(response);
+        String accessToken = authFunctions.authenticateInitialSuperUser();
         List<String> auths = new ArrayList<>();
         auths.add("Auth 1");
         auths.add("Auth 2");
@@ -365,12 +336,6 @@ public class AuthTests {
         APIResponse response = authFunctions.sendPasswordResetEmail(testEmail, accessToken);
         assertTrue(response.ok(), "Send password reset email failed: " + response.status() + " - " + response.text());
     } // Integration function end: Email
-
-    @Test
-    public void bootstrapSuperUserTest() {
-        APIResponse response = authFunctions.bootstrapSuperUser(testUsername, testEmail, testPassword);
-        assertTrue(response.ok(), "Bootstrap super user failed: " + response.status() + " - " + response.text());
-    }
 
     @Test
     public void serviceAccountAuthenticationTest() {

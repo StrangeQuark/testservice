@@ -7,6 +7,8 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,8 @@ public class AuthUtility {
     private final APIRequestContext apiRequestContext;
     private final String SERVICE_SECRET_TEST;
     private final String SERVICE_SECRET_EMAIL;
-    private final String AUTH_BOOTSTRAP_SECRET_KEY;
+    private final String INITIAL_SUPER_USERNAME;
+    private final String INITIAL_SUPER_PASSWORD;
 
     public AuthUtility(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;
@@ -24,8 +27,14 @@ public class AuthUtility {
 
         SERVICE_SECRET_EMAIL = EnvUtility.getEnvVar("SERVICE_SECRET_EMAIL");
 
-        // Attempt to get the AuthService bootstrap secret key for bootstrapSuperUserTest
-        AUTH_BOOTSTRAP_SECRET_KEY = EnvUtility.getEnvVar("AUTH_BOOTSTRAP_SECRET_KEY");
+        try {
+            String[] credentials = Files.readString(Path.of(EnvUtility.getEnvVar("INITIAL_SUPER_CREDENTIALS_FILE")))
+                    .split("\\n");
+            INITIAL_SUPER_USERNAME = credentials[0].replace("Username: ", "");
+            INITIAL_SUPER_PASSWORD = credentials[1].replace("Password: ", "");
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to read initial SUPER user credentials", ex);
+        }
     }
 
     public String authenticateServiceAccount() {
@@ -53,8 +62,12 @@ public class AuthUtility {
         }
     }
 
-    public String getAuthBootstrapSecretKey() {
-        return AUTH_BOOTSTRAP_SECRET_KEY;
+    public String getInitialSuperUsername() {
+        return INITIAL_SUPER_USERNAME;
+    }
+
+    public String getInitialSuperPassword() {
+        return INITIAL_SUPER_PASSWORD;
     }
 
     public String getServiceSecret(String clientId) {

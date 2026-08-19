@@ -8,7 +8,7 @@ services:
       - DUMMY_VAR=dummyvar
       - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST} # Integration line: Auth
       - SERVICE_SECRET_EMAIL=${SERVICE_SECRET_EMAIL} # Integration line: Auth
-      - AUTH_BOOTSTRAP_SECRET_KEY=${AUTH_BOOTSTRAP_SECRET_KEY} # Integration line: Auth
+      - INITIAL_SUPER_CREDENTIALS_FILE=/bootstrap/initial-super-user.txt # Integration line: Auth
       - AUTH_BASE_URL=${AUTH_BASE_URL} # Integration line: Auth
       - EMAIL_BASE_URL=${EMAIL_BASE_URL} # Integration line: Email
       - MAILDEV_BASE_URL=${MAILDEV_BASE_URL} # Integration line: Email
@@ -17,6 +17,7 @@ services:
       - VAULT_BASE_URL=${VAULT_BASE_URL} # Integration line: Vault
     volumes:
       - ./test-results:/testservice/test-results
+      - ${INITIAL_SUPER_CREDENTIALS_DIRECTORY}:/bootstrap:ro # Integration line: Auth
 networks:
   shared-network:
     external: true
