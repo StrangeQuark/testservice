@@ -328,6 +328,45 @@ public class AuthTests {
         APIResponse response = authFunctions.updateRole("SUPER", testUsername,  accessToken);
         assertFalse(response.ok(), "Update role failed: " + response.status() + " - " + response.text());
     }
+
+    @Test
+    public void updateRoleRejectsAdminPromotionToSuperTest() {
+        String superAccessToken = authFunctions.authenticateInitialSuperUser();
+
+        String adminUsername = "test_" + UUID.randomUUID();
+        String adminEmail = adminUsername + "@email.com";
+        String adminPassword = UUID.randomUUID().toString();
+
+        APIResponse response = authFunctions.register(adminUsername, adminEmail, adminPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        response = authFunctions.enableUser(adminEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.updateRole("ADMIN", adminUsername, superAccessToken);
+        assertTrue(response.ok(), "Admin role assignment failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.authenticate(adminUsername, adminPassword);
+        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
+        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+        String adminAccessToken = authFunctions.extractJwt(response);
+
+        response = authFunctions.updateRole("SUPER", adminUsername, adminAccessToken);
+        assertFalse(response.ok(), "ADMIN user should not promote itself to SUPER");
+        assertEquals(400, response.status());
+
+        response = authFunctions.register(testUsername, testEmail, testPassword);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        response = authFunctions.enableUser(testEmail);
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.updateRole("SUPER", testUsername, adminAccessToken);
+        assertFalse(response.ok(), "ADMIN user should not promote another user to SUPER");
+        assertEquals(400, response.status());
+
+        response = authFunctions.deleteUser(adminUsername, adminEmail, adminPassword);
+        assertTrue(response.ok(), "Admin user cleanup failed: " + response.status() + " - " + response.text());
+    }
     // Integration function start: Email
     @Test
     public void sendPasswordResetEmailTest() {
