@@ -6,6 +6,7 @@ services:
     container_name: test-service
     environment:
       - DUMMY_VAR=dummyvar
+      - BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN} # Integration line: Vault
       - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST} # Integration line: Auth
       - SERVICE_SECRET_EMAIL=${SERVICE_SECRET_EMAIL} # Integration line: Auth
       - INITIAL_SUPER_CREDENTIALS_FILE=/bootstrap/initial-super-user.txt # Integration line: Auth

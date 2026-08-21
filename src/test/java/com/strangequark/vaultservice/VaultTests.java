@@ -111,6 +111,14 @@ public class VaultTests {
     }
 
     @Test
+    public void bootstrapEnvFileTest() {
+        String bootstrapEnvironmentName = "testBootstrapEnvironment_" + UUID.randomUUID();
+
+        APIResponse response = vaultFunctions.bootstrapEnvFile(testServiceName, bootstrapEnvironmentName, ENV_TEST_FILE);
+        assertTrue(response.ok(), "Bootstrap env file test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
     public void getServiceTest() {
         APIResponse response = vaultFunctions.getService(testServiceName);
         assertTrue(response.ok(), "Get service test failed: " + response.status() + " - " + response.text());
@@ -409,5 +417,27 @@ public class VaultTests {
 
         authFunctions.deleteUser(vaultFunctions.testUsername, vaultFunctions.testEmail, vaultFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from all services test failed: " + response.status() + " - " + response.text());
-    } // Integration function end: Auth
+    } 
+    
+    @Test
+    public void bootstrapEnvFileAndUserTest() {
+        String bootstrapServiceName = "testBootstrapService_" + UUID.randomUUID();
+        String bootstrapEnvironmentName = "testBootstrapEnvironment_" + UUID.randomUUID();
+        String bootstrapUsername = "testBootstrapUser_" + UUID.randomUUID();
+        String bootstrapEmail = bootstrapUsername + "@email.com";
+        String bootstrapPassword = UUID.randomUUID().toString();
+
+        APIResponse response = vaultFunctions.bootstrapEnvFile(bootstrapServiceName, bootstrapEnvironmentName, ENV_TEST_FILE);
+        assertTrue(response.ok(), "Bootstrap env file test failed: " + response.status() + " - " + response.text());
+
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(bootstrapUsername, bootstrapEmail, bootstrapPassword);
+        response = vaultFunctions.bootstrapUser(bootstrapServiceName, accessToken);
+        assertTrue(response.ok(), "Bootstrap user test failed: " + response.status() + " - " + response.text());
+
+        response = vaultFunctions.deleteService(bootstrapServiceName, accessToken);
+        assertTrue(response.ok(), "Bootstrap service cleanup failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.deleteUser(bootstrapUsername, bootstrapEmail, bootstrapPassword);
+        assertTrue(response.ok(), "Bootstrap user cleanup failed: " + response.status() + " - " + response.text());
+    }// Integration function end: Auth
 }
