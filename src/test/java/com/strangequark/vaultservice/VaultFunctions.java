@@ -28,6 +28,7 @@ public class VaultFunctions {
     public String testPassword;// Integration function end: Auth
 
     public static final String VAULT_BASE_URL = EnvUtility.getEnvVar("VAULT_BASE_URL");
+    public static final String BOOTSTRAP_TOKEN = EnvUtility.getEnvVar("BOOTSTRAP_TOKEN");
 
     public VaultFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;
@@ -137,6 +138,20 @@ public class VaultFunctions {
         }
     }
 
+    public APIResponse bootstrapEnvFile(String testServiceName, String testEnvironmentName, String uploadFileName) {
+        try {
+            Path filePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + uploadFileName).toURI());
+            FormData formData = FormData.create().set("file", filePath);
+
+            return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/add-env/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+                    .setMultipart(formData)
+                    .setHeader("X-VAULT-BOOTSTRAP-TOKEN", BOOTSTRAP_TOKEN)
+            );
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException("Failed to load test file from resources", ex);
+        }
+    }
+
     public APIResponse downloadEnvFile(String testServiceName, String testEnvironmentName) {
         return apiRequestContext.get(VAULT_BASE_URL + "/download-env-file/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
@@ -161,12 +176,25 @@ public class VaultFunctions {
         );
     }
 
+    public APIResponse deleteService(String testServiceName, String accessToken) {
+        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-service/" + testServiceName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken)
+        );
+    }
+
     public APIResponse getAllServices() {
         return apiRequestContext.get(VAULT_BASE_URL + "/get-all-services", RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
     // Integration function start: Auth
+    public APIResponse bootstrapUser(String testServiceName, String accessToken) {
+        return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/bootstrap-user/" + testServiceName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken)
+                .setHeader("X-VAULT-BOOTSTRAP-TOKEN", BOOTSTRAP_TOKEN)
+        );
+    }
+
     public APIResponse getUsersByService(String testServiceName) {
         return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName, RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
