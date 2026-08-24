@@ -205,6 +205,16 @@ public class VaultFunctions {
         );
     }
 
+    public APIResponse getUsersByService(String testServiceName, String accessToken) {
+        return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken)
+        );
+    }
+
+    public APIResponse getUsersByServiceWithoutAccess(String testServiceName) {
+        return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName);
+    }
+
     public APIResponse getAllRoles() {
         return apiRequestContext.get(VAULT_BASE_URL + "/get-all-roles", RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
@@ -229,13 +239,17 @@ public class VaultFunctions {
     }
 
     public APIResponse addUserToService(String testServiceName) {
+        return addUserToService(testServiceName, testUsername, "MAINTAINER", authUtility.authenticateServiceAccount());
+    }
+
+    public APIResponse addUserToService(String testServiceName, String username, String role, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("serviceName", testServiceName);
-        requestBody.put("username", testUsername);
-        requestBody.put("role", "MAINTAINER");
+        requestBody.put("username", username);
+        requestBody.put("role", role);
 
         return apiRequestContext.post(VAULT_BASE_URL + "/add-user-to-service", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + accessToken)
         );
     }
 

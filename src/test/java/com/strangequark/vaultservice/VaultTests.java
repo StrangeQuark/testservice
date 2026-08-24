@@ -97,6 +97,13 @@ public class VaultTests {
 
         assertEquals(401, response.status());
     }
+
+    @Test
+    public void unauthenticatedGetUsersByServiceTest() {
+        APIResponse response = vaultFunctions.getUsersByServiceWithoutAccess("testService_" + UUID.randomUUID());
+
+        assertEquals(401, response.status());
+    }
     // Integration function end: Auth
 
     @Test
@@ -300,6 +307,33 @@ public class VaultTests {
 
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Get users by service return size test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void getUsersByServiceAccessTest() {
+        String managerUsername = "testManager_" + UUID.randomUUID();
+        String managerEmail = managerUsername + "@email.com";
+        String managerPassword = UUID.randomUUID().toString();
+        String managerToken = authFunctions.registerEnableAuthenticateAccess(managerUsername, managerEmail, managerPassword);
+
+        String nonMemberUsername = "testNonMember_" + UUID.randomUUID();
+        String nonMemberEmail = nonMemberUsername + "@email.com";
+        String nonMemberPassword = UUID.randomUUID().toString();
+        String nonMemberToken = authFunctions.registerEnableAuthenticateAccess(nonMemberUsername, nonMemberEmail, nonMemberPassword);
+
+        String ownerToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));
+        APIResponse response = vaultFunctions.addUserToService(testServiceName, managerUsername, "MANAGER", ownerToken);
+        assertTrue(response.ok(), "Add manager to service failed: " + response.status() + " - " + response.text());
+
+        response = vaultFunctions.getUsersByService(testServiceName, managerToken);
+        assertTrue(response.ok(), "Manager should be able to get service users: " + response.status() + " - " + response.text());
+        assertFalse(response.text().contains("\"id\""), "Service user response should not contain a membership id");
+
+        response = vaultFunctions.getUsersByService(testServiceName, nonMemberToken);
+        assertFalse(response.ok(), "Non-member should not be able to get service users");
+
+        authFunctions.deleteUser(managerUsername, managerEmail, managerPassword);
+        authFunctions.deleteUser(nonMemberUsername, nonMemberEmail, nonMemberPassword);
     }
 
     @Test
