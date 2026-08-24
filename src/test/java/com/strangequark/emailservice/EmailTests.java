@@ -38,6 +38,15 @@ public class EmailTests {
         assertTrue(response.ok(), "Email service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
+    // Integration function start: Auth
+    @Test
+    public void unauthenticatedSendEmailTest() {
+        APIResponse response = emailFunctions.sendEmailWithoutAccess();
+
+        assertEquals(401, response.status());
+    }
+    // Integration function end: Auth
+
     @Test
     public void sendEmailTest() {
         APIResponse response = emailFunctions.sendEmail("recipient@email.com", "sender@email.com",
