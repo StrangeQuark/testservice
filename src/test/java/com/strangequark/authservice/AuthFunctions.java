@@ -76,9 +76,12 @@ public class AuthFunctions {
         return apiRequestContext.post(AUTH_BASE_URL + "/authenticate", RequestOptions.create().setData(requestBody));
     }
 
-    public APIResponse serveAccessToken(String refreshToken) {
-        return apiRequestContext.get(AUTH_BASE_URL + "/access", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + refreshToken));
+    public APIResponse serveAccessToken() {
+        return apiRequestContext.post(AUTH_BASE_URL + "/access");
+    }
+
+    public APIResponse logout() {
+        return apiRequestContext.post(AUTH_BASE_URL + "/access/logout");
     }
 
     public APIResponse getUserId(String username, String accessToken) {
@@ -103,8 +106,8 @@ public class AuthFunctions {
         requestBody.put("password", password);
 
         enableUser(email);
-        String refreshToken = extractJwt(authenticate(username, password));
-        String accessToken = extractJwt(serveAccessToken(refreshToken));
+        authenticate(username, password);
+        String accessToken = extractJwt(serveAccessToken());
 
         return apiRequestContext.post(AUTH_BASE_URL + "/user/delete-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
@@ -158,7 +161,7 @@ public class AuthFunctions {
         APIResponse response = authenticate(authUtility.getInitialSuperUsername(),
                 authUtility.getInitialSuperPassword());
 
-        response = serveAccessToken(extractJwt(response));
+        response = serveAccessToken();
 
         return extractJwt(response);
     }
@@ -189,6 +192,47 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
+    public APIResponse createAuthorization(String authorization, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("name", authorization);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/authorization/create", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse getAuthorizations(String accessToken) {
+        return apiRequestContext.get(AUTH_BASE_URL + "/authorization/get-all", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse deleteAuthorization(String authorization, String accessToken) {
+        return apiRequestContext.delete(AUTH_BASE_URL + "/authorization/delete/" + authorization, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse addRoleAuthorization(String role, String authorization, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("role", role);
+        requestBody.put("authorization", authorization);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/role-authorization/add", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse getRoleAuthorizations(String role, String accessToken) {
+        return apiRequestContext.get(AUTH_BASE_URL + "/role-authorization/get?role=" + role, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse removeRoleAuthorization(String role, String authorization, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("role", role);
+        requestBody.put("authorization", authorization);
+
+        return apiRequestContext.delete(AUTH_BASE_URL + "/role-authorization/remove", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     public String registerEnableAuthenticateAccess(String username, String email, String password) {
         APIResponse response = register(username, email, password);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
@@ -199,7 +243,7 @@ public class AuthFunctions {
         response = authenticate(username, password);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
 
-        response = serveAccessToken(extractJwt(response));
+        response = serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
 
         return extractJwt(response);

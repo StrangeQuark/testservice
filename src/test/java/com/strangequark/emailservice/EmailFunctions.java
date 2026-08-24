@@ -27,6 +27,10 @@ public class EmailFunctions {
     }
 
     public APIResponse sendEmail(String recipient, String sender, String body, String subject) {
+        return sendEmail(recipient, sender, body, subject, authUtility.authenticateServiceAccount("auth"));
+    }
+
+    public APIResponse sendEmail(String recipient, String sender, String body, String subject, String accessToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("recipient", recipient);
         requestBody.put("sender", sender);
@@ -34,13 +38,13 @@ public class EmailFunctions {
         requestBody.put("subject", subject);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + accessToken) // Integration line: Auth
         );
     }
 
     public APIResponse getTemplateEmail(String templateName) {
         return apiRequestContext.get(EMAIL_BASE_URL + "/get-template-email?templateName=" + templateName, RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
@@ -54,7 +58,7 @@ public class EmailFunctions {
         requestBody.put("templateVariables", templateVariables);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/send-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
@@ -66,7 +70,7 @@ public class EmailFunctions {
         requestBody.put("tokenPurpose", tokenPurpose);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/create-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
@@ -77,13 +81,13 @@ public class EmailFunctions {
         requestBody.put("templateName", templateName);
 
         return apiRequestContext.put(EMAIL_BASE_URL + "/update-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
     public APIResponse deleteTemplateEmail(String templateName) {
         return apiRequestContext.delete(EMAIL_BASE_URL + "/delete-template-email?templateName=" + templateName,
-                RequestOptions.create().setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                RequestOptions.create().setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
@@ -96,7 +100,7 @@ public class EmailFunctions {
         requestBody.put("includeToken", true);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 

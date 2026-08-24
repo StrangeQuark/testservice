@@ -15,6 +15,7 @@ import java.util.Map;
 public class AuthUtility {
     private final APIRequestContext apiRequestContext;
     private final String SERVICE_SECRET_TEST;
+    private final String SERVICE_SECRET_AUTH;
     private final String SERVICE_SECRET_EMAIL;
     private final String INITIAL_SUPER_USERNAME;
     private final String INITIAL_SUPER_PASSWORD;
@@ -24,6 +25,8 @@ public class AuthUtility {
 
         // Attempt to get the TestService service secret for auth integrations
         SERVICE_SECRET_TEST = EnvUtility.getEnvVar("SERVICE_SECRET_TEST");
+
+        SERVICE_SECRET_AUTH = EnvUtility.getEnvVar("SERVICE_SECRET_AUTH");
 
         SERVICE_SECRET_EMAIL = EnvUtility.getEnvVar("SERVICE_SECRET_EMAIL");
 
@@ -71,6 +74,9 @@ public class AuthUtility {
     }
 
     public String getServiceSecret(String clientId) {
+        if(clientId.equals("auth"))
+            return SERVICE_SECRET_AUTH;
+
         if(clientId.equals("email"))
             return SERVICE_SECRET_EMAIL;
 
