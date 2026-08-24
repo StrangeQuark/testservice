@@ -41,9 +41,12 @@ public class EmailTests {
     // Integration function start: Auth
     @Test
     public void unauthenticatedSendEmailTest() {
-        APIResponse response = emailFunctions.sendEmailWithoutAccess();
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        EmailFunctions unauthenticatedEmailFunctions = new EmailFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedEmailFunctions.sendEmailWithoutAccess();
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
     }
     // Integration function end: Auth
 

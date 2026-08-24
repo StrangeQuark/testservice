@@ -93,16 +93,22 @@ public class VaultTests {
     // Integration function start: Auth
     @Test
     public void unauthenticatedGetAllServicesTest() {
-        APIResponse response = vaultFunctions.getAllServicesWithoutAccess();
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        VaultFunctions unauthenticatedVaultFunctions = new VaultFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedVaultFunctions.getAllServicesWithoutAccess();
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
     }
 
     @Test
     public void unauthenticatedGetUsersByServiceTest() {
-        APIResponse response = vaultFunctions.getUsersByServiceWithoutAccess("testService_" + UUID.randomUUID());
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        VaultFunctions unauthenticatedVaultFunctions = new VaultFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedVaultFunctions.getUsersByServiceWithoutAccess("testService_" + UUID.randomUUID());
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
     }
     // Integration function end: Auth
 

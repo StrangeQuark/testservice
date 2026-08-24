@@ -76,9 +76,12 @@ public class FileTests {
     // Integration function start: Auth
     @Test
     public void unauthenticatedGetAllCollectionsTest() {
-        APIResponse response = fileFunctions.getAllCollectionsWithoutAccess();
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        FileFunctions unauthenticatedFileFunctions = new FileFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedFileFunctions.getAllCollectionsWithoutAccess();
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
     }
     // Integration function end: Auth
 
