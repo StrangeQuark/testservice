@@ -76,9 +76,12 @@ public class AuthFunctions {
         return apiRequestContext.post(AUTH_BASE_URL + "/authenticate", RequestOptions.create().setData(requestBody));
     }
 
-    public APIResponse serveAccessToken(String refreshToken) {
-        return apiRequestContext.get(AUTH_BASE_URL + "/access", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + refreshToken));
+    public APIResponse serveAccessToken() {
+        return apiRequestContext.post(AUTH_BASE_URL + "/access");
+    }
+
+    public APIResponse logout() {
+        return apiRequestContext.post(AUTH_BASE_URL + "/access/logout");
     }
 
     public APIResponse getUserId(String username, String accessToken) {
@@ -103,8 +106,8 @@ public class AuthFunctions {
         requestBody.put("password", password);
 
         enableUser(email);
-        String refreshToken = extractJwt(authenticate(username, password));
-        String accessToken = extractJwt(serveAccessToken(refreshToken));
+        authenticate(username, password);
+        String accessToken = extractJwt(serveAccessToken());
 
         return apiRequestContext.post(AUTH_BASE_URL + "/user/delete-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
@@ -158,7 +161,7 @@ public class AuthFunctions {
         APIResponse response = authenticate(authUtility.getInitialSuperUsername(),
                 authUtility.getInitialSuperPassword());
 
-        response = serveAccessToken(extractJwt(response));
+        response = serveAccessToken();
 
         return extractJwt(response);
     }
@@ -240,7 +243,7 @@ public class AuthFunctions {
         response = authenticate(username, password);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
 
-        response = serveAccessToken(extractJwt(response));
+        response = serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
 
         return extractJwt(response);

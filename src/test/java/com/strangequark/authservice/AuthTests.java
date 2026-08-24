@@ -126,7 +126,7 @@ public class AuthTests {
 
         response = authFunctions.authenticate(adminUsername, adminPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
+        response = authFunctions.serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
         String adminAccessToken = authFunctions.extractJwt(response);
 
@@ -163,7 +163,7 @@ public class AuthTests {
         response = authFunctions.authenticate(testUsername, testPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
 
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
+        response = authFunctions.serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
     }
 
@@ -238,6 +238,9 @@ public class AuthTests {
 
         APIResponse response = authFunctions.updatePassword(testPassword, newPassword, accessToken);
         assertTrue(response.ok(), "Update password failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.serveAccessToken();
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
 
         // Set the testPassword to the newPassword for afterEach method
         testPassword = newPassword;
@@ -347,6 +350,10 @@ public class AuthTests {
         APIResponse response = authFunctions.updateEmail(testEmail, testPassword, accessToken);
         assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
 
+        response = authFunctions.serveAccessToken();
+        assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
+        accessToken = authFunctions.extractJwt(response);
+
         response = authFunctions.searchUsers(testUsername, accessToken);
         assertTrue(response.ok(), "Search users failed: " + response.status() + " - " + response.text());
 
@@ -362,10 +369,7 @@ public class AuthTests {
         APIResponse response = authFunctions.updateUsername(testUsername, testPassword, accessToken);
         assertTrue(response.ok(), "Update username failed: " + response.status() + " - " + response.text());
 
-        // We have to re-fetch the accessToken since the user's username has changed
-        response = authFunctions.authenticate(testUsername, testPassword);
-        assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
+        response = authFunctions.serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
         accessToken = authFunctions.extractJwt(response);
 
@@ -374,6 +378,17 @@ public class AuthTests {
 
         JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
         assertEquals(testUsername, jsonObject.get("username").getAsString());
+    }
+
+    @Test
+    public void logoutTest() {
+        authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
+
+        APIResponse response = authFunctions.logout();
+        assertTrue(response.ok(), "Logout failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.serveAccessToken();
+        assertFalse(response.ok(), "Access token retrieval should fail after logout");
     }
 
     @Test
@@ -402,7 +417,7 @@ public class AuthTests {
 
         response = authFunctions.authenticate(adminUsername, adminPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
-        response = authFunctions.serveAccessToken(authFunctions.extractJwt(response));
+        response = authFunctions.serveAccessToken();
         assertTrue(response.ok(), "Access token retrieval failed: " + response.status() + " - " + response.text());
         String adminAccessToken = authFunctions.extractJwt(response);
 
