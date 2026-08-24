@@ -53,6 +53,10 @@ public class FileFunctions {
         );
     }
 
+    public APIResponse getAllCollectionsWithoutAccess() {
+        return apiRequestContext.get(FILE_BASE_URL + "/get-all-collections");
+    }
+
     public APIResponse deleteCollection(String testCollectionName) {
         return apiRequestContext.delete(FILE_BASE_URL + "/delete-collection/" + testCollectionName, RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth

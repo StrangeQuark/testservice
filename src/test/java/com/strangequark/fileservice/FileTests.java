@@ -73,6 +73,15 @@ public class FileTests {
         assertTrue(response.ok(), "File service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
+    // Integration function start: Auth
+    @Test
+    public void unauthenticatedGetAllCollectionsTest() {
+        APIResponse response = fileFunctions.getAllCollectionsWithoutAccess();
+
+        assertEquals(401, response.status());
+    }
+    // Integration function end: Auth
+
     @Test
     public void createCollectionTest() {
         APIResponse response = fileFunctions.createCollection(testCollectionName);

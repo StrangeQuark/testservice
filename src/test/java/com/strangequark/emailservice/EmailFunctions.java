@@ -42,6 +42,16 @@ public class EmailFunctions {
         );
     }
 
+    public APIResponse sendEmailWithoutAccess() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("recipient", "recipient@email.com");
+        requestBody.put("sender", "sender@email.com");
+        requestBody.put("body", "Test email");
+        requestBody.put("subject", "Test subject");
+
+        return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody));
+    }
+
     public APIResponse getTemplateEmail(String templateName) {
         return apiRequestContext.get(EMAIL_BASE_URL + "/get-template-email?templateName=" + templateName, RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth

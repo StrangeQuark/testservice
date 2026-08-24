@@ -187,6 +187,10 @@ public class VaultFunctions {
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
+
+    public APIResponse getAllServicesWithoutAccess() {
+        return apiRequestContext.get(VAULT_BASE_URL + "/get-all-services");
+    }
     // Integration function start: Auth
     public APIResponse bootstrapUser(String testServiceName, String accessToken) {
         return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/bootstrap-user/" + testServiceName, RequestOptions.create()

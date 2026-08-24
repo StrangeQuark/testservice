@@ -17,6 +17,7 @@ services:
       - REACT_BASE_URL=${REACT_BASE_URL} # Integration line: React
       - FILE_BASE_URL=${FILE_BASE_URL} # Integration line: File
       - VAULT_BASE_URL=${VAULT_BASE_URL} # Integration line: Vault
+      - TELEMETRY_BASE_URL=${TELEMETRY_BASE_URL} # Integration line: Telemetry
     volumes:
       - ./test-results:/testservice/test-results
       - ${INITIAL_SUPER_CREDENTIALS_DIRECTORY}:/bootstrap:ro # Integration line: Auth

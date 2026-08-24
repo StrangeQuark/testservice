@@ -90,6 +90,15 @@ public class VaultTests {
         assertTrue(response.ok(), "Vault service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
+    // Integration function start: Auth
+    @Test
+    public void unauthenticatedGetAllServicesTest() {
+        APIResponse response = vaultFunctions.getAllServicesWithoutAccess();
+
+        assertEquals(401, response.status());
+    }
+    // Integration function end: Auth
+
     @Test
     public void createServiceTest() {
         testServiceName = "testService_" + UUID.randomUUID();
