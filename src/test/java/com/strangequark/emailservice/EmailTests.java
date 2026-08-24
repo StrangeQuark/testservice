@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
+import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
@@ -42,6 +44,34 @@ public class EmailTests {
                 "Test email", "Test subject");
 
         assertTrue(response.ok(), "Send email test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void superUserCanSendEmailTest() {
+        AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
+        String accessToken = authFunctions.authenticateInitialSuperUser();
+
+        APIResponse response = emailFunctions.sendEmail("recipient@email.com", "sender@email.com",
+                "Test email", "Test subject", accessToken);
+
+        assertTrue(response.ok(), "SUPER user email request failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void normalUserCannotSendEmailTest() {
+        AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
+        String username = "test_" + UUID.randomUUID();
+        String email = username + "@email.com";
+        String password = UUID.randomUUID().toString();
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(username, email, password);
+
+        APIResponse response = emailFunctions.sendEmail("recipient@email.com", "sender@email.com",
+                "Test email", "Test subject", accessToken);
+
+        assertEquals(403, response.status());
+
+        response = authFunctions.deleteUser(username, email, password);
+        assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test

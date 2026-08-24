@@ -8,6 +8,7 @@ services:
       - DUMMY_VAR=dummyvar
       - BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN} # Integration line: Vault
       - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST} # Integration line: Auth
+      - SERVICE_SECRET_AUTH=${SERVICE_SECRET_AUTH} # Integration line: Auth
       - SERVICE_SECRET_EMAIL=${SERVICE_SECRET_EMAIL} # Integration line: Auth
       - INITIAL_SUPER_CREDENTIALS_FILE=/bootstrap/initial-super-user.txt # Integration line: Auth
       - AUTH_BASE_URL=${AUTH_BASE_URL} # Integration line: Auth
