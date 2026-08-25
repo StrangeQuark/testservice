@@ -183,8 +183,12 @@ public class VaultFunctions {
     }
 
     public APIResponse getAllServices() {
+        return getAllServices(authUtility.authenticateServiceAccount());
+    }
+
+    public APIResponse getAllServices(String accessToken) {
         return apiRequestContext.get(VAULT_BASE_URL + "/get-all-services", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + accessToken)
         );
     }
 

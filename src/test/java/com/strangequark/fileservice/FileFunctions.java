@@ -48,8 +48,12 @@ public class FileFunctions {
     }
 
     public APIResponse getAllCollections() {
+        return getAllCollections(authUtility.authenticateServiceAccount());
+    }
+
+    public APIResponse getAllCollections(String accessToken) {
         return apiRequestContext.get(FILE_BASE_URL + "/get-all-collections", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + accessToken)
         );
     }
 

@@ -102,6 +102,20 @@ public class VaultTests {
     }
 
     @Test
+    public void normalUserCanGetAllServicesTest() {
+        String username = "test_" + UUID.randomUUID();
+        String email = username + "@email.com";
+        String password = UUID.randomUUID().toString();
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(username, email, password);
+
+        APIResponse response = vaultFunctions.getAllServices(accessToken);
+        assertTrue(response.ok(), "Normal user should access VaultService: " + response.status() + " - " + response.text());
+
+        response = authFunctions.deleteUser(username, email, password);
+        assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
     public void unauthenticatedGetUsersByServiceTest() {
         APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
         VaultFunctions unauthenticatedVaultFunctions = new VaultFunctions(unauthenticatedRequestContext);
