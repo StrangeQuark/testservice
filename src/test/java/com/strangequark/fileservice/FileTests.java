@@ -136,6 +136,12 @@ public class FileTests {
 
         response = fileFunctions.delete(testCollectionName);
         assertTrue(response.ok(), "File delete test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getAllFiles(testCollectionName);
+        assertTrue(response.ok(), "Get all files step in delete file test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(0, jsonArray.size(), "Deleted file should not be returned by get all files");
     }
 
     @Test

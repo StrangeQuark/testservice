@@ -115,6 +115,7 @@ public class ReactFileTests extends ReactTestsBase {
         assertTrue(audioPlayer.isVisible(), "Audio player should be visible after clicking Listen button");
 
         Locator audioSource = page.getByTestId("audio-source");
+        page.waitForFunction("() => document.querySelector('[data-testid=\"audio-source\"]').getAttribute('src') != null");
         String src = audioSource.getAttribute("src");
         Assertions.assertNotNull(src, "Audio src should not be null");
         Assertions.assertTrue(src.startsWith("blob:"), "Audio src should be a blob URL");
