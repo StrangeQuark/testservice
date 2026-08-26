@@ -93,7 +93,12 @@ public class ReactFunctions {
         // Integration function start: Email
         navigateToMailbox(page);
         page.getByPlaceholder("Search emails...").fill(email);
-        page.getByText("Activate your account", new Page.GetByTextOptions().setExact(true)).first().click();
+
+        Locator registrationEmail = page.getByTestId("email-list-item")
+                .filter(new Locator.FilterOptions().setHasText(email))
+                .filter(new Locator.FilterOptions().setHasText("Activate your account"));
+        registrationEmail.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        registrationEmail.click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
@@ -197,7 +202,12 @@ public class ReactFunctions {
 
     public void clickPasswordResetEmail(Page page, String email) {
         page.getByPlaceholder("Search emails...").fill(email);
-        page.getByText("Reset your password", new Page.GetByTextOptions().setExact(true)).first().click();
+
+        Locator resetEmail = page.getByTestId("email-list-item")
+                .filter(new Locator.FilterOptions().setHasText(email))
+                .filter(new Locator.FilterOptions().setHasText("Reset your password"));
+        resetEmail.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        resetEmail.click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
