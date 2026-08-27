@@ -83,10 +83,10 @@ public class ReactAuthTests extends ReactTestsBase {
         username = "test_" + UUID.randomUUID();
         reactFunctions.clickEditAndSubmitUpdateUsername(page, username, password);
 
-        Locator loginDiv = page.locator("id=login-div");
+        Locator usernameTextElement = page.getByText("Username: " + username);
 
-        loginDiv.waitFor(WAIT_FOR_VISIBLE);
-        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's username");
+        usernameTextElement.waitFor(WAIT_FOR_VISIBLE);
+        assertEquals("Username: " + username, usernameTextElement.innerText(), "New username should be visible after updating");
     }
 
     @Test
@@ -115,10 +115,10 @@ public class ReactAuthTests extends ReactTestsBase {
         reactFunctions.clickEditAndSubmitUpdatePassword(page, password, newPassword);
         password = newPassword;
 
-        Locator loginDiv = page.locator("id=login-div");
+        Locator accountSettingsHeader = page.getByText("Account Information");
 
-        loginDiv.waitFor(WAIT_FOR_VISIBLE);
-        assertTrue(loginDiv.isVisible(), "Login div should be visible after updating user's password");
+        accountSettingsHeader.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(accountSettingsHeader.isVisible(), "User should remain logged in after updating their password");
     }
 
     @Test

@@ -1,8 +1,7 @@
 services:
   test-service:
     build: .
-    networks:
-      - shared-network
+    network_mode: host
     container_name: test-service
     environment:
       - DUMMY_VAR=dummyvar

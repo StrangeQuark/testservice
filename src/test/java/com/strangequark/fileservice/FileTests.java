@@ -76,9 +76,26 @@ public class FileTests {
     // Integration function start: Auth
     @Test
     public void unauthenticatedGetAllCollectionsTest() {
-        APIResponse response = fileFunctions.getAllCollectionsWithoutAccess();
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        FileFunctions unauthenticatedFileFunctions = new FileFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedFileFunctions.getAllCollectionsWithoutAccess();
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
+    }
+
+    @Test
+    public void normalUserCanGetAllCollectionsTest() {
+        String username = "test_" + UUID.randomUUID();
+        String email = username + "@email.com";
+        String password = UUID.randomUUID().toString();
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(username, email, password);
+
+        APIResponse response = fileFunctions.getAllCollections(accessToken);
+        assertTrue(response.ok(), "Normal user should access FileService: " + response.status() + " - " + response.text());
+
+        response = authFunctions.deleteUser(username, email, password);
+        assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
     }
     // Integration function end: Auth
 
@@ -119,6 +136,12 @@ public class FileTests {
 
         response = fileFunctions.delete(testCollectionName);
         assertTrue(response.ok(), "File delete test failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.getAllFiles(testCollectionName);
+        assertTrue(response.ok(), "Get all files step in delete file test failed: " + response.status() + " - " + response.text());
+
+        JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
+        assertEquals(0, jsonArray.size(), "Deleted file should not be returned by get all files");
     }
 
     @Test

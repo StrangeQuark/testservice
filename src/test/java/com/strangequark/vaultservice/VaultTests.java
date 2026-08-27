@@ -93,9 +93,36 @@ public class VaultTests {
     // Integration function start: Auth
     @Test
     public void unauthenticatedGetAllServicesTest() {
-        APIResponse response = vaultFunctions.getAllServicesWithoutAccess();
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        VaultFunctions unauthenticatedVaultFunctions = new VaultFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedVaultFunctions.getAllServicesWithoutAccess();
 
         assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
+    }
+
+    @Test
+    public void normalUserCanGetAllServicesTest() {
+        String username = "test_" + UUID.randomUUID();
+        String email = username + "@email.com";
+        String password = UUID.randomUUID().toString();
+        String accessToken = authFunctions.registerEnableAuthenticateAccess(username, email, password);
+
+        APIResponse response = vaultFunctions.getAllServices(accessToken);
+        assertTrue(response.ok(), "Normal user should access VaultService: " + response.status() + " - " + response.text());
+
+        response = authFunctions.deleteUser(username, email, password);
+        assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void unauthenticatedGetUsersByServiceTest() {
+        APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
+        VaultFunctions unauthenticatedVaultFunctions = new VaultFunctions(unauthenticatedRequestContext);
+        APIResponse response = unauthenticatedVaultFunctions.getUsersByServiceWithoutAccess("testService_" + UUID.randomUUID());
+
+        assertEquals(401, response.status());
+        unauthenticatedRequestContext.dispose();
     }
     // Integration function end: Auth
 
@@ -300,6 +327,33 @@ public class VaultTests {
 
         JsonArray jsonArray = JsonParser.parseString(response.text()).getAsJsonArray();
         assertEquals(1, jsonArray.size(), "Get users by service return size test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void getUsersByServiceAccessTest() {
+        String managerUsername = "testManager_" + UUID.randomUUID();
+        String managerEmail = managerUsername + "@email.com";
+        String managerPassword = UUID.randomUUID().toString();
+        String managerToken = authFunctions.registerEnableAuthenticateAccess(managerUsername, managerEmail, managerPassword);
+
+        String nonMemberUsername = "testNonMember_" + UUID.randomUUID();
+        String nonMemberEmail = nonMemberUsername + "@email.com";
+        String nonMemberPassword = UUID.randomUUID().toString();
+        String nonMemberToken = authFunctions.registerEnableAuthenticateAccess(nonMemberUsername, nonMemberEmail, nonMemberPassword);
+
+        String ownerToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));
+        APIResponse response = vaultFunctions.addUserToService(testServiceName, managerUsername, "MANAGER", ownerToken);
+        assertTrue(response.ok(), "Add manager to service failed: " + response.status() + " - " + response.text());
+
+        response = vaultFunctions.getUsersByService(testServiceName, managerToken);
+        assertTrue(response.ok(), "Manager should be able to get service users: " + response.status() + " - " + response.text());
+        assertFalse(response.text().contains("\"id\""), "Service user response should not contain a membership id");
+
+        response = vaultFunctions.getUsersByService(testServiceName, nonMemberToken);
+        assertFalse(response.ok(), "Non-member should not be able to get service users");
+
+        authFunctions.deleteUser(managerUsername, managerEmail, managerPassword);
+        authFunctions.deleteUser(nonMemberUsername, nonMemberEmail, nonMemberPassword);
     }
 
     @Test

@@ -93,7 +93,12 @@ public class ReactFunctions {
         // Integration function start: Email
         navigateToMailbox(page);
         page.getByPlaceholder("Search emails...").fill(email);
-        page.getByText("Activate your account", new Page.GetByTextOptions().setExact(true)).click();
+
+        Locator registrationEmail = page.getByTestId("email-list-item")
+                .filter(new Locator.FilterOptions().setHasText(email))
+                .filter(new Locator.FilterOptions().setHasText("Activate your account"));
+        registrationEmail.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        registrationEmail.click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
@@ -197,7 +202,12 @@ public class ReactFunctions {
 
     public void clickPasswordResetEmail(Page page, String email) {
         page.getByPlaceholder("Search emails...").fill(email);
-        page.getByText("Reset your password", new Page.GetByTextOptions().setExact(true)).click();
+
+        Locator resetEmail = page.getByTestId("email-list-item")
+                .filter(new Locator.FilterOptions().setHasText(email))
+                .filter(new Locator.FilterOptions().setHasText("Reset your password"));
+        resetEmail.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        resetEmail.click();
 
         FrameLocator emailFrame = page.frameLocator("iframe").first();
 
@@ -213,7 +223,7 @@ public class ReactFunctions {
     // Integration function end: Email
     // Integration function start: File
     public void clickToolbarFilesButton(Page page) {
-        page.getByText("Files").click();
+        page.getByTestId("files-nav-link").click();
     }
 
     public void navigateToFiles(Page page) {
@@ -245,7 +255,7 @@ public class ReactFunctions {
     }
 
     public Download clickFileDownloadButton(Page page) {
-        return page.waitForDownload(() -> page.getByText("Download").click());
+        return page.waitForDownload(() -> page.locator(".download-btn").click());
     }
 
     public String getFileContent(Path filePath) {
@@ -275,7 +285,7 @@ public class ReactFunctions {
     // Integration function end: File
     // Integration function start: Vault
     public void clickToolbarVaultButton(Page page) {
-        page.getByText("Vault").click();
+        page.getByTestId("vault-nav-link").click();
     }
 
     public void navigateToVault(Page page) {

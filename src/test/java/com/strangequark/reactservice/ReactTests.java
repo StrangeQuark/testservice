@@ -12,7 +12,7 @@ public class ReactTests extends ReactTestsBase {
     public void ensureHomePageLoadingTest() {
         reactFunctions.navigateToHomePage(page);
 
-        Locator homeButton = page.getByText("Home");
+        Locator homeButton = page.getByTestId("home-nav-link");
 
         homeButton.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(homeButton.isVisible(), "Home button should be visible in the toolbar after navigating to home page");
