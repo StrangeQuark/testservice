@@ -98,9 +98,10 @@ public class FileFunctions {
         );
     }
 
-    public APIResponse streamFile(String testCollectionName, String fileName) {
+    public APIResponse streamFile(String testCollectionName, String fileName, String range) {
         return apiRequestContext.get(FILE_BASE_URL + "/stream/" + testCollectionName + "/" + fileName, RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Range", range)
         );
     }
     // Integration function start: Auth
