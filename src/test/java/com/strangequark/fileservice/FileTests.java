@@ -180,7 +180,7 @@ public class FileTests {
         APIResponse response = fileFunctions.upload(testCollectionName, TEXT_TEST_FILE);
         assertTrue(response.ok(), "File upload step in stream file test failed: " + response.status() + " - " + response.text());
 
-        response = fileFunctions.streamFile(testCollectionName, TEXT_TEST_FILE);
+        response = fileFunctions.streamFile(testCollectionName, TEXT_TEST_FILE, "bytes=0-");
         assertTrue(response.ok(), "File stream test failed: " + response.status() + " - " + response.text());
 
         try {
@@ -189,6 +189,16 @@ public class FileTests {
         } catch (Exception ex) {
             throw new RuntimeException("Failed to load test file from resources", ex);
         }
+    }
+
+    @Test
+    public void streamFileRejectsInvalidRangeTest() {
+        APIResponse response = fileFunctions.upload(testCollectionName, TEXT_TEST_FILE);
+        assertTrue(response.ok(), "File upload setup failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.streamFile(testCollectionName, TEXT_TEST_FILE, "bytes=-");
+
+        assertEquals(416, response.status());
     }
     // Integration function start: Auth
     @Test
