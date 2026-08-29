@@ -26,6 +26,7 @@ public class FileFunctions {
     public String testPassword;// Integration function end: Auth
 
     public static final String FILE_BASE_URL = EnvUtility.getEnvVar("FILE_BASE_URL");
+    public static final String GATEWAY_BASE_URL = EnvUtility.getEnvVar("GATEWAY_BASE_URL"); // Integration line: Gateway
 
     public FileFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;
@@ -104,6 +105,24 @@ public class FileFunctions {
                 .setHeader("Range", range)
         );
     }
+    // Integration function start: Gateway
+    public APIResponse streamFileThroughGateway(String testCollectionName, String fileName, String range) {
+        return apiRequestContext.get(GATEWAY_BASE_URL + "/api/file/stream/" + testCollectionName + "/" + fileName, RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Origin", "http://localhost:6080")
+                .setHeader("Range", range)
+        );
+    }
+
+    public APIResponse preflightThroughGateway(String testCollectionName, String fileName, String origin) {
+        return apiRequestContext.fetch(GATEWAY_BASE_URL + "/api/file/stream/" + testCollectionName + "/" + fileName, RequestOptions.create()
+                .setMethod("OPTIONS")
+                .setHeader("Origin", origin)
+                .setHeader("Access-Control-Request-Method", "GET")
+                .setHeader("Access-Control-Request-Headers", "authorization,range")
+        );
+    }
+    // Integration function end: Gateway
     // Integration function start: Auth
     public APIResponse getCurrentUserRole(String testCollectionName) {
         return apiRequestContext.get(FILE_BASE_URL + "/get-current-user-role/" + testCollectionName, RequestOptions.create()

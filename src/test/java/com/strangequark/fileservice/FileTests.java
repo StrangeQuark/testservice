@@ -200,6 +200,27 @@ public class FileTests {
 
         assertEquals(416, response.status());
     }
+    // Integration function start: Gateway
+    @Test
+    public void gatewayPassesFileCorsHeadersTest() {
+        APIResponse response = fileFunctions.upload(testCollectionName, TEXT_TEST_FILE);
+        assertTrue(response.ok(), "File upload setup failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.preflightThroughGateway(testCollectionName, TEXT_TEST_FILE, "http://localhost:6080");
+        assertTrue(response.ok(), "Gateway CORS preflight failed: " + response.status() + " - " + response.text());
+        assertEquals("http://localhost:6080", response.headers().get("access-control-allow-origin"));
+
+        response = fileFunctions.streamFileThroughGateway(testCollectionName, TEXT_TEST_FILE, "bytes=0-");
+        assertEquals(206, response.status());
+        assertEquals("http://localhost:6080", response.headers().get("access-control-allow-origin"));
+        assertTrue(response.headers().get("access-control-expose-headers").contains("Content-Range"));
+        assertTrue(response.headers().get("content-range") != null);
+        assertEquals("Gateway Service", response.headers().get("x-powered-by"));
+
+        response = fileFunctions.preflightThroughGateway(testCollectionName, TEXT_TEST_FILE, "http://not-allowed.example");
+        assertEquals(403, response.status());
+    }
+    // Integration function end: Gateway
     // Integration function start: Auth
     @Test
     public void getCurrentUserRoleTest() {
