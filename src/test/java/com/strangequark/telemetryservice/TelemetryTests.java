@@ -11,9 +11,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
@@ -48,14 +50,54 @@ public class TelemetryTests {
     }
 
     @Test
-    public void serviceAccountCanGetEventsTest() {
+    public void serviceAccountCannotGetEventsTest() {
         AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
         String accessToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));
 
         APIResponse response = telemetryFunctions.getEvents(accessToken);
 
-        assertTrue(response.ok(), "Test service account should access TelemetryService: " +
+        assertEquals(403, response.status());
+    }
+
+    @Test
+    public void superUserCanGetEventsTest() {
+        AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
+        String accessToken = authFunctions.authenticateInitialSuperUser();
+
+        APIResponse response = telemetryFunctions.getEvents(accessToken);
+
+        assertTrue(response.ok(), "SUPER user should access TelemetryService: " +
                 response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void serviceAccountCannotSpoofTelemetryEventTest() {
+        AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
+        String serviceAccountToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));
+        String eventType = "test-" + UUID.randomUUID();
+        String suppliedId = UUID.randomUUID().toString();
+        String suppliedTimestamp = LocalDateTime.now().minusYears(1).toString();
+
+        APIResponse response = telemetryFunctions.createEvent(
+                "spoofed-service",
+                eventType,
+                suppliedId,
+                suppliedTimestamp,
+                serviceAccountToken
+        );
+
+        assertTrue(response.ok(), "Service account event creation failed: " +
+                response.status() + " - " + response.text());
+
+        String superUserToken = authFunctions.authenticateInitialSuperUser();
+        response = telemetryFunctions.getEvents(eventType, superUserToken);
+
+        assertTrue(response.ok(), "SUPER user could not retrieve telemetry event: " +
+                response.status() + " - " + response.text());
+        assertTrue(response.text().contains("\"serviceName\":\"test\""));
+        assertFalse(response.text().contains("spoofed-service"));
+        assertFalse(response.text().contains(suppliedId));
+        assertFalse(response.text().contains(suppliedTimestamp));
     }
 
     @Test
