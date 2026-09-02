@@ -45,69 +45,92 @@ public class VaultFunctions {
     }
 
     public APIResponse createService(String testServiceName) {
-        return apiRequestContext.post(VAULT_BASE_URL + "/create-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/create-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse createEnvironment(String testServiceName, String testEnvironmentName) {
-        return apiRequestContext.post(VAULT_BASE_URL + "/create-environment/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/create-environment", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getService(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getEnvironmentsByService(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-environments-by-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-environments-by-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getEnvironment(String testServiceName, String testEnvironmentName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-environment/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-environment", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getVariablesByService(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-variables-by-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-variables-by-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getVariablesByEnvironment(String testServiceName, String testEnvironmentName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-variables-by-environment/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-variables-by-environment", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getVariableByName(String testServiceName, String testEnvironmentName, String testVariableName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-variable-by-name/" + testServiceName + "/" + testEnvironmentName + "/" + testVariableName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        requestBody.put("variableName", testVariableName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-variable-by-name", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse addVariable(String testServiceName, String testEnvironmentName, String key, String value) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("key", key);
-        requestBody.put("value", value);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        requestBody.put("variable", Map.of("key", key, "value", value));
 
-        return apiRequestContext.post(VAULT_BASE_URL + "/add-variable/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create().setData(requestBody)
+        return apiRequestContext.post(VAULT_BASE_URL + "/add-variable", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse updateVariable(String testServiceName, String testEnvironmentName, String key, String value) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("key", key);
-        requestBody.put("value", value);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        requestBody.put("variable", Map.of("key", key, "value", value));
 
-        return apiRequestContext.post(VAULT_BASE_URL + "/update-variable/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create().setData(requestBody)
+        return apiRequestContext.post(VAULT_BASE_URL + "/update-variable", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
@@ -119,8 +142,12 @@ public class VaultFunctions {
 
         List<Map<String, String>> requestList = new ArrayList<>();
         requestList.add(requestBody);
+        Map<String, Object> request = new HashMap<>();
+        request.put("serviceName", testServiceName);
+        request.put("environmentName", testEnvironmentName);
+        request.put("variables", requestList);
 
-        return apiRequestContext.post(VAULT_BASE_URL + "/update-variables/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create().setData(requestList)
+        return apiRequestContext.post(VAULT_BASE_URL + "/update-variables", RequestOptions.create().setData(request)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
@@ -128,9 +155,9 @@ public class VaultFunctions {
     public APIResponse addEnvFile(String testServiceName, String testEnvironmentName, String uploadFileName) {
         try {
             Path filePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + uploadFileName).toURI());
-            FormData formData = FormData.create().set("file", filePath);
+            FormData formData = FormData.create().set("file", filePath).set("serviceName", testServiceName).set("environmentName", testEnvironmentName);
 
-            return apiRequestContext.post(VAULT_BASE_URL + "/add-env-file/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create().setMultipart(formData)
+            return apiRequestContext.post(VAULT_BASE_URL + "/add-env-file", RequestOptions.create().setMultipart(formData)
                     .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
             );
         } catch (URISyntaxException ex) {
@@ -141,9 +168,9 @@ public class VaultFunctions {
     public APIResponse bootstrapEnvFile(String testServiceName, String testEnvironmentName, String uploadFileName) {
         try {
             Path filePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + uploadFileName).toURI());
-            FormData formData = FormData.create().set("file", filePath);
+            FormData formData = FormData.create().set("file", filePath).set("serviceName", testServiceName).set("environmentName", testEnvironmentName);
 
-            return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/add-env/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+            return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/add-env", RequestOptions.create()
                     .setMultipart(formData)
                     .setHeader("X-VAULT-BOOTSTRAP-TOKEN", BOOTSTRAP_TOKEN)
             );
@@ -153,31 +180,45 @@ public class VaultFunctions {
     }
 
     public APIResponse downloadEnvFile(String testServiceName, String testEnvironmentName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/download-env-file/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/download-env-file", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse deleteVariable(String testServiceName, String testEnvironmentName, String testVariableName) {
-        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-variable/" + testServiceName + "/" + testEnvironmentName + "/" + testVariableName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        requestBody.put("variableName", testVariableName);
+        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-variable", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse deleteEnvironment(String testServiceName, String testEnvironmentName) {
-        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-environment/" + testServiceName + "/" + testEnvironmentName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        requestBody.put("environmentName", testEnvironmentName);
+        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-environment", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse deleteService(String testServiceName) {
-        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse deleteService(String testServiceName, String accessToken) {
-        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.delete(VAULT_BASE_URL + "/delete-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken)
         );
     }
@@ -197,26 +238,34 @@ public class VaultFunctions {
     }
     // Integration function start: Auth
     public APIResponse bootstrapUser(String testServiceName, String accessToken) {
-        return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/bootstrap-user/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/bootstrap-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken)
                 .setHeader("X-VAULT-BOOTSTRAP-TOKEN", BOOTSTRAP_TOKEN)
         );
     }
 
     public APIResponse getUsersByService(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-users-by-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }
 
     public APIResponse getUsersByService(String testServiceName, String accessToken) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-users-by-service", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken)
         );
     }
 
     public APIResponse getUsersByServiceWithoutAccess(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-users-by-service/" + testServiceName);
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-users-by-service", RequestOptions.create().setData(requestBody));
     }
 
     public APIResponse getAllRoles() {
@@ -226,7 +275,9 @@ public class VaultFunctions {
     }
 
     public APIResponse getCurrentUserRole(String testServiceName) {
-        return apiRequestContext.get(VAULT_BASE_URL + "/get-current-user-role/" + testServiceName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("serviceName", testServiceName);
+        return apiRequestContext.post(VAULT_BASE_URL + "/get-current-user-role", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
         );
     }

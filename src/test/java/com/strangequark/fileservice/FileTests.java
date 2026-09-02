@@ -101,8 +101,21 @@ public class FileTests {
 
     @Test
     public void createCollectionTest() {
+        testCollectionName = "testCollection_" + UUID.randomUUID();
+
         APIResponse response = fileFunctions.createCollection(testCollectionName);
         assertTrue(response.ok(), "Create collection test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void collectionNameSupportsReservedCharactersTest() {
+        String collectionName = "test collection/" + UUID.randomUUID();
+
+        APIResponse response = fileFunctions.createCollection(collectionName);
+        assertTrue(response.ok(), "Create collection with reserved characters failed: " + response.status() + " - " + response.text());
+
+        response = fileFunctions.deleteCollection(collectionName);
+        assertTrue(response.ok(), "Delete collection with reserved characters failed: " + response.status() + " - " + response.text());
     }
 
     @Test

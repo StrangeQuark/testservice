@@ -85,12 +85,18 @@ public class AuthFunctions {
     }
 
     public APIResponse getUserId(String username, String accessToken) {
-        return apiRequestContext.get(AUTH_BASE_URL + "/user/get-user-id?username=" + username, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", username);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/user/get-user-id", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
     public APIResponse searchUsers(String query, String accessToken) {
-        return apiRequestContext.get(AUTH_BASE_URL + "/user/search-users?query=" + query, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("query", query);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/user/search-users", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
@@ -206,7 +212,10 @@ public class AuthFunctions {
     }
 
     public APIResponse deleteAuthorization(String authorization, String accessToken) {
-        return apiRequestContext.delete(AUTH_BASE_URL + "/authorization/delete/" + authorization, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("name", authorization);
+
+        return apiRequestContext.delete(AUTH_BASE_URL + "/authorization/delete", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
@@ -220,7 +229,10 @@ public class AuthFunctions {
     }
 
     public APIResponse getRoleAuthorizations(String role, String accessToken) {
-        return apiRequestContext.get(AUTH_BASE_URL + "/role-authorization/get?role=" + role, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("role", role);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/role-authorization/get", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 

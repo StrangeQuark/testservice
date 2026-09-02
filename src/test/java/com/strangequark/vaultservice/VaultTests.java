@@ -135,6 +135,21 @@ public class VaultTests {
     }
 
     @Test
+    public void serviceAndEnvironmentNamesSupportReservedCharactersTest() {
+        String serviceName = "test service/" + UUID.randomUUID();
+        String environmentName = "test environment[" + UUID.randomUUID() + "]";
+
+        APIResponse response = vaultFunctions.createService(serviceName);
+        assertTrue(response.ok(), "Create service with reserved characters failed: " + response.status() + " - " + response.text());
+
+        response = vaultFunctions.createEnvironment(serviceName, environmentName);
+        assertTrue(response.ok(), "Create environment with reserved characters failed: " + response.status() + " - " + response.text());
+
+        response = vaultFunctions.deleteService(serviceName);
+        assertTrue(response.ok(), "Delete service with reserved characters failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
     public void createEnvironmentTest() {
         testServiceName = "testService_" + UUID.randomUUID();
         testEnvironmentName = "testEnvironment_" + UUID.randomUUID();
