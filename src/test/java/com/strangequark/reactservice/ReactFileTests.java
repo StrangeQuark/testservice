@@ -143,7 +143,7 @@ public class ReactFileTests extends ReactTestsBase {
 
         String src = videoPlayer.getAttribute("src");
         assertNotNull(src, "Video src should not be null");
-        assertTrue(src.contains("/api/file/stream/"), "Video src should be a stream URL");
+        assertTrue(src.contains("/api/file/stream?"), "Video src should be a stream URL");
     }
 
     @Test

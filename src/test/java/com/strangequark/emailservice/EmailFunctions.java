@@ -53,7 +53,10 @@ public class EmailFunctions {
     }
 
     public APIResponse getTemplateEmail(String templateName) {
-        return apiRequestContext.get(EMAIL_BASE_URL + "/get-template-email?templateName=" + templateName, RequestOptions.create()
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("templateName", templateName);
+
+        return apiRequestContext.post(EMAIL_BASE_URL + "/get-template-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
@@ -96,8 +99,11 @@ public class EmailFunctions {
     }
 
     public APIResponse deleteTemplateEmail(String templateName) {
-        return apiRequestContext.delete(EMAIL_BASE_URL + "/delete-template-email?templateName=" + templateName,
-                RequestOptions.create().setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("templateName", templateName);
+
+        return apiRequestContext.delete(EMAIL_BASE_URL + "/delete-template-email", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
     }
 
