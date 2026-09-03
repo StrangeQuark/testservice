@@ -58,8 +58,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: testservice/test-results/report.html
-          if-no-files-found: ignore
+          path: test-results/report.html
+          if-no-files-found: error
 
       - name: Cleanup
         if: always()

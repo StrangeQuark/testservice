@@ -48,10 +48,10 @@ pipeline {
         stage("Publish HTML Report") {
             steps {
                 publishHTML(target: [
-                    allowMissing: true,
+                    allowMissing: false,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
-                    reportDir: 'testservice/test-results',
+                    reportDir: 'test-results',
                     reportFiles: 'report.html',
                     reportName: 'Test Report'
                 ])
