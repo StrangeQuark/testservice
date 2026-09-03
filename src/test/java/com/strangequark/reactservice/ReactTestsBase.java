@@ -23,6 +23,7 @@ public class ReactTestsBase {
     public Playwright playwright;
     public Page page;
     public Browser browser;
+    public BrowserContext context;
     public ReactFunctions reactFunctions;
     public final Locator.WaitForOptions WAIT_FOR_VISIBLE = new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE);
     public final Locator.WaitForOptions WAIT_FOR_DETACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED);
@@ -76,7 +77,8 @@ public class ReactTestsBase {
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         browser = playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(true));
-        page = browser.newPage();
+        context = browser.newContext();
+        page = context.newPage();
 
         page.onConsoleMessage(msg -> System.out.println(msg.text()));
         page.onRequestFailed(req -> {
@@ -100,12 +102,25 @@ public class ReactTestsBase {
 
     @AfterEach
     public void afterEach(TestInfo testInfo) {
-        browser.close();
-        page.close();
-        // Integration function start: Auth
-        if(testInfo.getTestMethod().get().getName().startsWith("user")) {
-            authFunctions.deleteUser(username, email, password);
-            assertFalse(authFunctions.getUserId(username, authUtility.authenticateServiceAccount()).ok(), "User cleanup failed in React service register test");
-        }// Integration function end: Auth
+        try {
+            // Integration function start: Auth
+            if(testInfo.getTestMethod().get().getName().startsWith("user")) {
+                authFunctions.deleteUser(username, email, password);
+                assertFalse(authFunctions.getUserId(username, authUtility.authenticateServiceAccount()).ok(), "User cleanup failed in React service register test");
+            }// Integration function end: Auth
+        } finally {
+            if(page != null)
+                page.close();
+            if(context != null)
+                context.close();
+            if(browser != null)
+                browser.close();
+        }
+    }
+
+    @AfterAll
+    public void afterAll() {
+        apiRequestContext.dispose(); // Integration line: Auth
+        playwright.close();
     }
 }

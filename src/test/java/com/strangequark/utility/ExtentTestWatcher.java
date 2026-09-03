@@ -2,42 +2,60 @@ package com.strangequark.utility;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestWatcher;
 
 import java.util.Optional;
 
-public class ExtentTestWatcher implements TestWatcher, BeforeTestExecutionCallback {
+public class ExtentTestWatcher implements TestWatcher, BeforeEachCallback, AfterAllCallback {
     private static final ExtentReports extent = ExtentManager.getInstance();
     private static final ThreadLocal<ExtentTest> currentTest = new ThreadLocal<>();
 
     @Override
-    public void beforeTestExecution(ExtensionContext context) {
-        String testName = context.getDisplayName();
-        ExtentTest test = extent.createTest(testName);
-        currentTest.set(test);
-        test.info("Starting test: " + testName);
+    public void beforeEach(ExtensionContext context) {
+        getCurrentTest(context).info("Starting test: " + context.getDisplayName());
     }
 
     @Override
     public void testSuccessful(ExtensionContext context) {
-        currentTest.get().pass("✅ Test passed");
+        getCurrentTest(context).pass("✅ Test passed");
+        currentTest.remove();
     }
 
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
-        currentTest.get().fail("❌ Test failed: " + cause.getMessage());
+        getCurrentTest(context).fail("❌ Test failed: " + cause.getMessage());
+        currentTest.remove();
     }
 
     @Override
     public void testAborted(ExtensionContext context, Throwable cause) {
-        currentTest.get().skip("⚠️ Test aborted: " + cause.getMessage());
+        getCurrentTest(context).skip("⚠️ Test aborted: " + cause.getMessage());
+        currentTest.remove();
     }
 
     @Override
     public void testDisabled(ExtensionContext context, Optional<String> reason) {
-        currentTest.get().skip("⏭️ Test skipped: " + reason.orElse("No reason provided"));
+        getCurrentTest(context).skip("⏭️ Test skipped: " + reason.orElse("No reason provided"));
+        currentTest.remove();
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        extent.flush();
+    }
+
+    private ExtentTest getCurrentTest(ExtensionContext context) {
+        ExtentTest test = currentTest.get();
+
+        if(test == null) {
+            test = extent.createTest(context.getDisplayName());
+            currentTest.set(test);
+        }
+
+        return test;
     }
 
     // Optional utility to get the current test in progress
@@ -45,8 +63,4 @@ public class ExtentTestWatcher implements TestWatcher, BeforeTestExecutionCallba
         return currentTest.get();
     }
 
-    // Flush once at JVM shutdown
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(extent::flush));
-    }
 }

@@ -32,6 +32,12 @@ public class AuthTests {
         authFunctions = new AuthFunctions(apiRequestContext);
     }
 
+    @AfterAll
+    public static void afterAll() {
+        apiRequestContext.dispose();
+        playwright.close();
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         if(testInfo.getTestMethod().get().getName().equals("healthcheckTest")) {
