@@ -20,14 +20,22 @@ jobs:
         run: |
           echo "Requesting environment variables from Vault..."
 
-          curl -s \
+          response=$(curl -sS --fail-with-body \
+            -X POST \
             -H "X-CICD-TOKEN: $CICD_TOKEN" \
-            "$VAULT_URL/api/vault/cicd/testservice/e3" \
-            | tr -d '{}' \
-            | tr ',' '\n' \
-            | sed 's/"//g' \
-            | sed 's/:/=/g' \
-            > testservice.env
+            -H "Content-Type: application/json" \
+            -d '{"serviceName":"testservice","environmentName":"e3"}' \
+            "$VAULT_URL/api/vault/cicd") || {
+              echo "Unable to retrieve environment variables from Vault"
+              exit 1
+            }
+
+          if ! echo "$response" | jq -e 'type == "array" and length > 0 and all(.[]; (.key | type == "string" and length > 0) and (.value | type == "string"))' > /dev/null; then
+            echo "Vault returned an invalid environment-variable response"
+            exit 1
+          fi
+
+          echo "$response" | jq -r '.[] | "\(.key)=\(.value)"' > testservice.env
 
           echo "Environment variables written to testservice.env"
         # Integration function end: Vault
