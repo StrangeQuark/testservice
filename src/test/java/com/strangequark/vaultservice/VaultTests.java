@@ -61,7 +61,7 @@ public class VaultTests {
         }
         testServiceName = "testService_" + UUID.randomUUID();
         testEnvironmentName = "testEnvironment_" + UUID.randomUUID();
-        testVariableName = "testVariable_" + UUID.randomUUID();
+        testVariableName = "testVariable_" + UUID.randomUUID().toString().replace("-", "_");
         testVariableValue = "testValue_" + UUID.randomUUID();
 
         APIResponse response = vaultFunctions.createService(testServiceName);
