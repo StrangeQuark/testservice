@@ -154,7 +154,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
         String fileContent = reactFunctions.getEnvFileContent(download.path());
 
-        String expectedContent = testVariableKey + "=" + testVariableValue + "\n";
+        String expectedContent = testVariableKey + "=\"" + testVariableValue + "\"\n";
         assertEquals(expectedContent, fileContent, "Downloaded env file contents should match expected");
     }
 

@@ -95,7 +95,7 @@ public class ReactTestsBase {
         collectionName = "collection_" + UUID.randomUUID();// Integration line: File
         serviceName = "service_" + UUID.randomUUID();// Integration function start: Vault
         environmentName = "environment_" + UUID.randomUUID();
-        testVariableKey = "testKey_" + UUID.randomUUID();
+        testVariableKey = "testKey_" + UUID.randomUUID().toString().replace("-", "_");
         testVariableValue = "testValue_" + UUID.randomUUID();
         // Integration function end: Vault
     }
