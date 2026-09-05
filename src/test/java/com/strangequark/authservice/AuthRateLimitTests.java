@@ -1,6 +1,6 @@
-// Integration file: Gateway
+// Integration file: Auth
 
-package com.strangequark.gatewayservice;
+package com.strangequark.authservice;
 
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ExtentTestWatcher.class)
 @Tag("rate-limit")
-public class GatewayRateLimitTests {
-    private static final String GATEWAY_BASE_URL = EnvUtility.getEnvVar("GATEWAY_BASE_URL");
+public class AuthRateLimitTests {
+    private static final String AUTH_BASE_URL = EnvUtility.getEnvVar("AUTH_BASE_URL");
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
 
@@ -38,15 +38,35 @@ public class GatewayRateLimitTests {
     }
 
     @Test
-    public void authTrafficRateLimitTest() {
-        assertRateLimit("/api/auth/access", 80);
+    public void loginRateLimitTest() {
+        assertRateLimit("/authenticate", 11);
+    }
+
+    @Test
+    public void registerRateLimitTest() {
+        assertRateLimit("/register", 3);
+    }
+
+    @Test
+    public void sendPasswordResetEmailRateLimitTest() {
+        assertRateLimit("/user/send-password-reset-email", 4);
+    }
+
+    @Test
+    public void resetPasswordRateLimitTest() {
+        assertRateLimit("/user/reset-password", 4);
+    }
+
+    @Test
+    public void serviceAccountRateLimitTest() {
+        assertRateLimit("/service-account/authenticate", 31);
     }
 
     private void assertRateLimit(String endpoint, int attempts) {
         APIResponse response = null;
 
         for(int i = 0; i < attempts; i++) {
-            response = apiRequestContext.post(GATEWAY_BASE_URL + endpoint,
+            response = apiRequestContext.post(AUTH_BASE_URL + endpoint,
                     RequestOptions.create().setData(new HashMap<>()));
         }
 

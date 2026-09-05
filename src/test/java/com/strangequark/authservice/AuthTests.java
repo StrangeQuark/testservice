@@ -32,6 +32,12 @@ public class AuthTests {
         authFunctions = new AuthFunctions(apiRequestContext);
     }
 
+    @AfterAll
+    public static void afterAll() {
+        apiRequestContext.dispose();
+        playwright.close();
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         if(testInfo.getTestMethod().get().getName().equals("healthcheckTest")) {
@@ -444,6 +450,10 @@ public class AuthTests {
 
         APIResponse response = authFunctions.sendPasswordResetEmail(testEmail, accessToken);
         assertTrue(response.ok(), "Send password reset email failed: " + response.status() + " - " + response.text());
+
+        APIResponse missingUserResponse = authFunctions.sendPasswordResetEmail("missing_" + UUID.randomUUID() + "@email.com", accessToken);
+        assertEquals(response.status(), missingUserResponse.status());
+        assertEquals(response.text(), missingUserResponse.text());
     } // Integration function end: Email
 
     @Test

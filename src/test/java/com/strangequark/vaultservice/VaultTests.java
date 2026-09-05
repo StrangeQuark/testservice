@@ -46,6 +46,12 @@ public class VaultTests {
         );
     }
 
+    @AfterAll
+    public static void afterAll() {
+        apiRequestContext.dispose();
+        playwright.close();
+    }
+
     @BeforeEach
     public void beforeEach(TestInfo testInfo) {
         if(testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
@@ -55,7 +61,7 @@ public class VaultTests {
         }
         testServiceName = "testService_" + UUID.randomUUID();
         testEnvironmentName = "testEnvironment_" + UUID.randomUUID();
-        testVariableName = "testVariable_" + UUID.randomUUID();
+        testVariableName = "testVariable_" + UUID.randomUUID().toString().replace("-", "_");
         testVariableValue = "testValue_" + UUID.randomUUID();
 
         APIResponse response = vaultFunctions.createService(testServiceName);

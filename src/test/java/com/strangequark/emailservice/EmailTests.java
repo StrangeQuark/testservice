@@ -32,6 +32,12 @@ public class EmailTests {
         emailFunctions = new EmailFunctions(apiRequestContext);
     }
 
+    @AfterAll
+    public static void afterAll() {
+        apiRequestContext.dispose();
+        playwright.close();
+    }
+
     @Test
     public void healthcheckTest() {
         APIResponse response = emailFunctions.healthcheck();

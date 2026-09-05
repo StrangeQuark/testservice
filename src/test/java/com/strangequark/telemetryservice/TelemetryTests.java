@@ -7,6 +7,7 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
 import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.ExtentTestWatcher;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,12 @@ public class TelemetryTests {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
         telemetryFunctions = new TelemetryFunctions(apiRequestContext);
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        apiRequestContext.dispose();
+        playwright.close();
     }
 
     @Test
