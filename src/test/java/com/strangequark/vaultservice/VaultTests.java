@@ -108,6 +108,22 @@ public class VaultTests {
     }
 
     @Test
+    public void invalidAccessTokenCannotGetAllServicesTest() {
+        APIResponse response = vaultFunctions.getAllServices("invalid-token");
+
+        assertEquals(401, response.status());
+    }
+
+    @Test
+    public void emailServiceAccountCannotGetAllServicesTest() {
+        String accessToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("email"));
+
+        APIResponse response = vaultFunctions.getAllServices(accessToken);
+
+        assertEquals(403, response.status());
+    }
+
+    @Test
     public void normalUserCanGetAllServicesTest() {
         String username = "test_" + UUID.randomUUID();
         String email = username + "@email.com";
@@ -173,6 +189,16 @@ public class VaultTests {
 
         APIResponse response = vaultFunctions.bootstrapEnvFile(testServiceName, bootstrapEnvironmentName, ENV_TEST_FILE);
         assertTrue(response.ok(), "Bootstrap env file test failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void bootstrapEnvFileWithoutTokenTest() {
+        String bootstrapServiceName = "testBootstrapService_" + UUID.randomUUID();
+        String bootstrapEnvironmentName = "testBootstrapEnvironment_" + UUID.randomUUID();
+
+        APIResponse response = vaultFunctions.bootstrapEnvFileWithoutToken(bootstrapServiceName, bootstrapEnvironmentName, ENV_TEST_FILE);
+
+        assertEquals(400, response.status());
     }
 
     @Test

@@ -53,6 +53,32 @@ public class ReactAuthTests extends ReactTestsBase {
     }
 
     @Test
+    public void userSessionPersistsAfterReloadTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        page.reload();
+
+        Locator usernameButton = page.getByText(username);
+        usernameButton.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(usernameButton.isVisible(), "The user should remain logged in after reloading");
+    }
+
+    @Test
+    public void userLogoutPreventsSessionRefreshTest() {
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
+
+        page.getByText(username).click();
+        page.getByText("Logout").click();
+
+        Locator loginButton = page.getByTestId("loginButton");
+        loginButton.waitFor(WAIT_FOR_VISIBLE);
+
+        page.reload();
+        loginButton.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(loginButton.isVisible(), "The user should remain logged out after reloading");
+    }
+
+    @Test
     public void ensureUserSettingsRedirectsToLoginTest() {
         reactFunctions.navigateToUserSettings(page);
 
