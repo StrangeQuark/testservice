@@ -32,12 +32,44 @@ public class AuthFunctions {
     }
 
     public APIResponse register(String username, String email, String password) {
+        String accessToken = authenticateInitialSuperUser();
+        String inviteToken = createInvitationToken(email, accessToken);
+        return register(username, email, password, inviteToken);
+    }
+
+    public APIResponse registerWithoutInvitation(String username, String email, String password) {
+        return register(username, email, password, null);
+    }
+
+    public APIResponse register(String username, String email, String password, String inviteToken) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", username);
         requestBody.put("email", email);
         requestBody.put("password", password);
+        if(inviteToken != null)
+            requestBody.put("inviteToken", inviteToken);
 
         return apiRequestContext.post(AUTH_BASE_URL + "/register", RequestOptions.create().setData(requestBody));
+    }
+
+    public APIResponse getInviteOnly() {
+        return apiRequestContext.get(AUTH_BASE_URL + "/invitation/invite-only");
+    }
+
+    public APIResponse createInvitation(String email, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", email);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/invitation/create", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public String createInvitationToken(String email, String accessToken) {
+        APIResponse response = createInvitation(email, accessToken);
+        assertTrue(response.ok(), "Invitation creation failed: " + response.status() + " - " + response.text());
+
+        JsonObject jsonObject = JsonParser.parseString(response.text()).getAsJsonObject();
+        return jsonObject.get("token").getAsString();
     }
 
     public APIResponse enableUser(String email) {

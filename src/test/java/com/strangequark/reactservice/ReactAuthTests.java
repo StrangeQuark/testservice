@@ -23,7 +23,7 @@ public class ReactAuthTests extends ReactTestsBase {
 
     @Test
     public void ensureRegisterDivLoadingTest() {
-        reactFunctions.navigateToRegister(page);
+        reactFunctions.navigateToRegister(page, email);
 
         Locator registerDiv = page.locator("id=register-div");
 
@@ -33,7 +33,7 @@ public class ReactAuthTests extends ReactTestsBase {
 
     @Test
     public void userRegisterTest() {
-        reactFunctions.navigateToRegister(page);
+        reactFunctions.navigateToRegister(page, email);
         reactFunctions.fillAndSubmitRegisterForm(page, username, email, password);
 
         Locator requestSuccessTextField = page.locator("id=request-success-text-field");

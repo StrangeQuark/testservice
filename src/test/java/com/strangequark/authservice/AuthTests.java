@@ -54,7 +54,8 @@ public class AuthTests {
         if(testInfo.getTestMethod().get().getName().equals("healthcheckTest") ||
                 testInfo.getTestMethod().get().getName().equals("deleteUserTest")  ||
                 testInfo.getTestMethod().get().getName().equals("serviceAccountAuthenticationTest") ||
-                testInfo.getTestMethod().get().getName().equals("authorizationManagementTest")) {
+                testInfo.getTestMethod().get().getName().equals("authorizationManagementTest") ||
+                testInfo.getTestMethod().get().getName().equals("invitationRequiresAuthorizationTest")) {
             return;
         }
 
@@ -74,6 +75,34 @@ public class AuthTests {
     public void registerTest() {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+    }
+
+    @Test
+    public void invitationOnlyRegistrationTest() {
+        APIResponse response = authFunctions.getInviteOnly();
+        assertTrue(response.ok(), "Invite-only status failed: " + response.status() + " - " + response.text());
+        assertTrue(JsonParser.parseString(response.text()).getAsJsonObject().get("inviteOnly").getAsBoolean(), "Invite-only mode should be enabled");
+
+        response = authFunctions.registerWithoutInvitation(testUsername, testEmail, testPassword);
+        assertFalse(response.ok(), "Registration without an invitation should fail");
+
+        String superAccessToken = authFunctions.authenticateInitialSuperUser();
+        String inviteToken = authFunctions.createInvitationToken(testEmail, superAccessToken);
+
+        response = authFunctions.register(testUsername, testEmail, testPassword, inviteToken);
+        assertTrue(response.ok(), "Registration with an invitation failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.register("second_" + testUsername, testEmail, testPassword, inviteToken);
+        assertFalse(response.ok(), "Used invitation should fail");
+    }
+
+    @Test
+    public void invitationRequiresAuthorizationTest() {
+        APIResponse response = authFunctions.serviceAccountAuthenticate("test");
+        String accessToken = authFunctions.extractJwt(response);
+
+        response = authFunctions.createInvitation(testEmail, accessToken);
+        assertEquals(403, response.status(), "Service account without invitation authorization should be rejected");
     }
     // Integration function start: Email
     @Test
