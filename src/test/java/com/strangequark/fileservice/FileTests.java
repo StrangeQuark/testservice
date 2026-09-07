@@ -103,6 +103,22 @@ public class FileTests {
         response = authFunctions.deleteUser(username, email, password);
         assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
     }
+
+    @Test
+    public void invalidAccessTokenCannotGetAllCollectionsTest() {
+        APIResponse response = fileFunctions.getAllCollections("invalid-token");
+
+        assertEquals(401, response.status());
+    }
+
+    @Test
+    public void emailServiceAccountCannotGetAllCollectionsTest() {
+        String accessToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("email"));
+
+        APIResponse response = fileFunctions.getAllCollections(accessToken);
+
+        assertEquals(403, response.status());
+    }
     // Integration function end: Auth
 
     @Test

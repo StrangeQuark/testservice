@@ -179,6 +179,17 @@ public class VaultFunctions {
         }
     }
 
+    public APIResponse bootstrapEnvFileWithoutToken(String testServiceName, String testEnvironmentName, String uploadFileName) {
+        try {
+            Path filePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + uploadFileName).toURI());
+            FormData formData = FormData.create().set("file", filePath).set("serviceName", testServiceName).set("environmentName", testEnvironmentName);
+
+            return apiRequestContext.post(VAULT_BASE_URL + "/bootstrap/add-env", RequestOptions.create().setMultipart(formData));
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException("Failed to load test file from resources", ex);
+        }
+    }
+
     public APIResponse downloadEnvFile(String testServiceName, String testEnvironmentName) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("serviceName", testServiceName);

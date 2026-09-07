@@ -57,6 +57,13 @@ public class TelemetryTests {
     }
 
     @Test
+    public void invalidAccessTokenCannotGetEventsTest() {
+        APIResponse response = telemetryFunctions.getEvents("invalid-token");
+
+        assertEquals(401, response.status());
+    }
+
+    @Test
     public void serviceAccountCannotGetEventsTest() {
         AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
         String accessToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));

@@ -7,6 +7,7 @@ import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
+import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.EnvUtility;
 
 import java.io.IOException;
@@ -18,8 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ReactFunctions {
     public static final String REACT_BASE_URL = EnvUtility.getEnvVar("REACT_BASE_URL");
     public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL"); // Integration line: Email
+    private final AuthFunctions authFunctions;
 
-    public ReactFunctions() {
+    public ReactFunctions(AuthFunctions authFunctions) {
+        this.authFunctions = authFunctions;
 
     }
 
@@ -42,6 +45,12 @@ public class ReactFunctions {
 
     public void navigateToRegister(Page page) {
         page.navigate(REACT_BASE_URL + "/register");
+    }
+
+    public void navigateToRegister(Page page, String email) {
+        String accessToken = authFunctions.authenticateInitialSuperUser();
+        String inviteToken = authFunctions.createInvitationToken(email, accessToken);
+        page.navigate(REACT_BASE_URL + "/register#inviteToken=" + inviteToken);
     }
 
     public void fillAndSubmitRegisterForm(Page page, String username, String email, String password) {
@@ -88,7 +97,7 @@ public class ReactFunctions {
     }
 
     public void registerAndEnable(Page page, String username, String email, String password) {
-        navigateToRegister(page);
+        navigateToRegister(page, email);
         fillAndSubmitRegisterForm(page, username, email, password);
         // Integration function start: Email
         navigateToMailbox(page);

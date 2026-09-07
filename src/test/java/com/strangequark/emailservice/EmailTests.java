@@ -54,6 +54,14 @@ public class EmailTests {
         assertEquals(401, response.status());
         unauthenticatedRequestContext.dispose();
     }
+
+    @Test
+    public void invalidAccessTokenCannotSendEmailTest() {
+        APIResponse response = emailFunctions.sendEmail("recipient@email.com", "sender@email.com",
+                "Test email", "Test subject", "invalid-token");
+
+        assertEquals(401, response.status());
+    }
     // Integration function end: Auth
 
     @Test

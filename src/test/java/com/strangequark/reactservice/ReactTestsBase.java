@@ -55,9 +55,9 @@ public class ReactTestsBase {
     @BeforeAll
     public void beforeAll() throws URISyntaxException {
         playwright = Playwright.create();
-        reactFunctions = new ReactFunctions();
         apiRequestContext = playwright.request().newContext(); // Integration line: Auth
         authFunctions = new AuthFunctions(apiRequestContext);// Integration line: Auth
+        reactFunctions = new ReactFunctions(authFunctions);
         authUtility = new AuthUtility(apiRequestContext);// Integration line: Auth
         textFileName = "testUploadFile.txt";// Integration function start: File
         textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());
