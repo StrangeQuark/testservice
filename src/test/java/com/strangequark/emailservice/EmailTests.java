@@ -84,6 +84,14 @@ public class EmailTests {
     }
 
     @Test
+    public void getAllTemplateEmailsTest() {
+        APIResponse response = emailFunctions.getAllTemplateEmails();
+
+        assertTrue(response.ok(), "Template list request failed: " + response.status() + " - " + response.text());
+        assertTrue(response.text().contains("USER_REGISTER"));
+    }
+
+    @Test
     public void normalUserCannotSendEmailTest() {
         AuthFunctions authFunctions = new AuthFunctions(apiRequestContext);
         String username = "test_" + UUID.randomUUID();

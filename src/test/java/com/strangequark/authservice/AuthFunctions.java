@@ -64,6 +64,24 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
+    public APIResponse getAllInvitations(String accessToken) {
+        return apiRequestContext.get(AUTH_BASE_URL + "/invitation/get-all", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse deleteInvitation(String id, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("id", id);
+
+        return apiRequestContext.delete(AUTH_BASE_URL + "/invitation/delete", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse deleteAllInvitations(String accessToken) {
+        return apiRequestContext.delete(AUTH_BASE_URL + "/invitation/delete-all", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
     public String createInvitationToken(String email, String accessToken) {
         APIResponse response = createInvitation(email, accessToken);
         assertTrue(response.ok(), "Invitation creation failed: " + response.status() + " - " + response.text());
@@ -129,6 +147,14 @@ public class AuthFunctions {
         requestBody.put("query", query);
 
         return apiRequestContext.post(AUTH_BASE_URL + "/user/search-users", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse getAdminUser(String query, String accessToken) {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("query", query);
+
+        return apiRequestContext.post(AUTH_BASE_URL + "/user/get-admin-user", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
@@ -265,6 +291,11 @@ public class AuthFunctions {
         requestBody.put("role", role);
 
         return apiRequestContext.post(AUTH_BASE_URL + "/role-authorization/get", RequestOptions.create().setData(requestBody)
+                .setHeader("Authorization", "Bearer " + accessToken));
+    }
+
+    public APIResponse getAllRoles(String accessToken) {
+        return apiRequestContext.get(AUTH_BASE_URL + "/role-authorization/get-all-roles", RequestOptions.create()
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 

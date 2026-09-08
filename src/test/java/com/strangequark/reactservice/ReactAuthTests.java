@@ -164,6 +164,18 @@ public class ReactAuthTests extends ReactTestsBase {
         loginDiv.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(loginDiv.isVisible(), "Login div should be visible after deleting user");
     }
+
+    @Test
+    public void superUserAdminPageTest() {
+        reactFunctions.navigateToLogin(page);
+        reactFunctions.fillAndSubmitLoginForm(page, authUtility.getInitialSuperUsername(), authUtility.getInitialSuperPassword());
+
+        page.navigate(ReactFunctions.REACT_BASE_URL + "/admin");
+
+        Locator administrationHeader = page.getByText("Administration");
+        administrationHeader.waitFor(WAIT_FOR_VISIBLE);
+        assertTrue(administrationHeader.isVisible(), "SUPER user should be able to view the administration page");
+    }
     // Integration function start: Email
     @Test
     public void ensurePasswordResetDivLoadingTest() {
