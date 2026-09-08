@@ -321,14 +321,7 @@ public class AuthTests {
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
         String accessToken = authFunctions.authenticateInitialSuperUser();
-        List<String> auths = new ArrayList<>();
-        auths.add("AUTH_1_" + UUID.randomUUID());
-        auths.add("AUTH_2_" + UUID.randomUUID());
-
-        response = authFunctions.createAuthorization(auths.get(0), accessToken);
-        assertTrue(response.ok(), "First authorization creation failed: " + response.status() + " - " + response.text());
-        response = authFunctions.createAuthorization(auths.get(1), accessToken);
-        assertTrue(response.ok(), "Second authorization creation failed: " + response.status() + " - " + response.text());
+        List<String> auths = List.of("EMAIL_API_ACCESS", "TELEMETRY_API_ACCESS");
 
         response = authFunctions.addAuthorizationsToUser(testUsername, auths, accessToken);
         assertTrue(response.ok(), "Add authorizations test failed: " + response.status() + " - " + response.text());
@@ -338,10 +331,6 @@ public class AuthTests {
 
         response = authFunctions.removeAuthorizations(testUsername, auths, accessToken);
         assertTrue(response.ok(), "Authorization cleanup failed: " + response.status() + " - " + response.text());
-        response = authFunctions.deleteAuthorization(auths.get(0), accessToken);
-        assertTrue(response.ok(), "First authorization deletion failed: " + response.status() + " - " + response.text());
-        response = authFunctions.deleteAuthorization(auths.get(1), accessToken);
-        assertTrue(response.ok(), "Second authorization deletion failed: " + response.status() + " - " + response.text());
     }
 
     @Test
@@ -351,29 +340,19 @@ public class AuthTests {
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
         response = authFunctions.enableUser(testEmail);
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
-        List<String> auths = new ArrayList<>();
-        auths.add("AUTH_" + UUID.randomUUID());
-
-        response = authFunctions.createAuthorization(auths.getFirst(), accessToken);
-        assertTrue(response.ok(), "Authorization creation failed: " + response.status() + " - " + response.text());
+        List<String> auths = List.of("EMAIL_API_ACCESS");
         response = authFunctions.addAuthorizationsToUser(testUsername, auths, accessToken);
         assertTrue(response.ok(), "Authorization setup failed: " + response.status() + " - " + response.text());
         response = authFunctions.removeAuthorizations(testUsername, auths, accessToken);
         assertTrue(response.ok(), "Remove authorizations test failed: " + response.status() + " - " + response.text());
-
-        response = authFunctions.deleteAuthorization(auths.getFirst(), accessToken);
-        assertTrue(response.ok(), "Authorization cleanup failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void authorizationManagementTest() {
         String accessToken = authFunctions.authenticateInitialSuperUser();
-        String authorization = "AUTH_" + UUID.randomUUID();
+        String authorization = "EMAIL_API_ACCESS";
 
-        APIResponse response = authFunctions.createAuthorization(authorization, accessToken);
-        assertTrue(response.ok(), "Authorization creation failed: " + response.status() + " - " + response.text());
-
-        response = authFunctions.addRoleAuthorization("ADMIN", authorization, accessToken);
+        APIResponse response = authFunctions.addRoleAuthorization("ADMIN", authorization, accessToken);
         assertTrue(response.ok(), "Role authorization creation failed: " + response.status() + " - " + response.text());
 
         response = authFunctions.getRoleAuthorizations("ADMIN", accessToken);
@@ -382,16 +361,13 @@ public class AuthTests {
 
         response = authFunctions.removeRoleAuthorization("ADMIN", authorization, accessToken);
         assertTrue(response.ok(), "Role authorization deletion failed: " + response.status() + " - " + response.text());
-
-        response = authFunctions.deleteAuthorization(authorization, accessToken);
-        assertTrue(response.ok(), "Authorization deletion failed: " + response.status() + " - " + response.text());
     }
 
     @Test
     public void authorizationManagementRequiresSuperUserTest() {
         String accessToken = authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
 
-        APIResponse response = authFunctions.createAuthorization("AUTH_" + UUID.randomUUID(), accessToken);
+        APIResponse response = authFunctions.addRoleAuthorization("ADMIN", "EMAIL_API_ACCESS", accessToken);
 
         assertEquals(403, response.status());
     }

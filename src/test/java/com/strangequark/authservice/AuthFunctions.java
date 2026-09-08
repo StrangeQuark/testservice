@@ -256,24 +256,8 @@ public class AuthFunctions {
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
-    public APIResponse createAuthorization(String authorization, String accessToken) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("name", authorization);
-
-        return apiRequestContext.post(AUTH_BASE_URL + "/authorization/create", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + accessToken));
-    }
-
     public APIResponse getAuthorizations(String accessToken) {
         return apiRequestContext.get(AUTH_BASE_URL + "/authorization/get-all", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + accessToken));
-    }
-
-    public APIResponse deleteAuthorization(String authorization, String accessToken) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("name", authorization);
-
-        return apiRequestContext.delete(AUTH_BASE_URL + "/authorization/delete", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + accessToken));
     }
 
