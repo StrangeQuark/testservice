@@ -124,14 +124,14 @@ public class VaultTests {
     }
 
     @Test
-    public void normalUserCanGetAllServicesTest() {
+    public void normalUserCannotGetAllServicesTest() {
         String username = "test_" + UUID.randomUUID();
         String email = username + "@email.com";
         String password = UUID.randomUUID().toString();
         String accessToken = authFunctions.registerEnableAuthenticateAccess(username, email, password);
 
         APIResponse response = vaultFunctions.getAllServices(accessToken);
-        assertTrue(response.ok(), "Normal user should access VaultService: " + response.status() + " - " + response.text());
+        assertEquals(403, response.status());
 
         response = authFunctions.deleteUser(username, email, password);
         assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
@@ -383,13 +383,18 @@ public class VaultTests {
         String managerPassword = UUID.randomUUID().toString();
         String managerToken = authFunctions.registerEnableAuthenticateAccess(managerUsername, managerEmail, managerPassword);
 
+        APIResponse response = authFunctions.updateRole("DEVELOPER", managerUsername, authFunctions.authenticateInitialSuperUser());
+        assertTrue(response.ok(), "Promote manager to developer failed: " + response.status() + " - " + response.text());
+        authFunctions.authenticate(managerUsername, managerPassword);
+        managerToken = authFunctions.extractJwt(authFunctions.serveAccessToken());
+
         String nonMemberUsername = "testNonMember_" + UUID.randomUUID();
         String nonMemberEmail = nonMemberUsername + "@email.com";
         String nonMemberPassword = UUID.randomUUID().toString();
         String nonMemberToken = authFunctions.registerEnableAuthenticateAccess(nonMemberUsername, nonMemberEmail, nonMemberPassword);
 
         String ownerToken = authFunctions.extractJwt(authFunctions.serviceAccountAuthenticate("test"));
-        APIResponse response = vaultFunctions.addUserToService(testServiceName, managerUsername, "MANAGER", ownerToken);
+        response = vaultFunctions.addUserToService(testServiceName, managerUsername, "MANAGER", ownerToken);
         assertTrue(response.ok(), "Add manager to service failed: " + response.status() + " - " + response.text());
 
         response = vaultFunctions.getUsersByService(testServiceName, managerToken);
@@ -541,6 +546,10 @@ public class VaultTests {
         assertTrue(response.ok(), "Bootstrap env file test failed: " + response.status() + " - " + response.text());
 
         String accessToken = authFunctions.registerEnableAuthenticateAccess(bootstrapUsername, bootstrapEmail, bootstrapPassword);
+        response = authFunctions.updateRole("DEVELOPER", bootstrapUsername, authFunctions.authenticateInitialSuperUser());
+        assertTrue(response.ok(), "Bootstrap user promotion failed: " + response.status() + " - " + response.text());
+        authFunctions.authenticate(bootstrapUsername, bootstrapPassword);
+        accessToken = authFunctions.extractJwt(authFunctions.serveAccessToken());
         response = vaultFunctions.bootstrapUser(bootstrapServiceName, accessToken);
         assertTrue(response.ok(), "Bootstrap user test failed: " + response.status() + " - " + response.text());
 

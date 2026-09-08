@@ -11,6 +11,15 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactVaultTests extends ReactTestsBase {
+    private void registerEnableAndLoginDeveloper() {
+        reactFunctions.registerAndEnable(page, username, email, password);
+
+        assertTrue(authFunctions.updateRole("DEVELOPER", username, authFunctions.authenticateInitialSuperUser()).ok());
+
+        reactFunctions.navigateToLogin(page);
+        reactFunctions.fillAndSubmitLoginForm(page, username, password);
+    }
+
     // Integration function start: Auth
     @Test
     public void ensureToolbarVaultButtonRedirectsToLoginTest() {
@@ -27,7 +36,7 @@ public class ReactVaultTests extends ReactTestsBase {
     // Integration function end: Auth
     @Test
     public void userCreateServiceTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -41,7 +50,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userCreateEnvironmentTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -58,7 +67,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userAddVariableTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -69,7 +78,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userUnmaskVariableTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -83,7 +92,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userCopyVariableTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -112,7 +121,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteVariableTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -128,7 +137,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userUploadEnvFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -143,7 +152,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDownloadEnvFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -160,7 +169,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteEnvironmentTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -183,7 +192,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteServiceTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        registerEnableAndLoginDeveloper(); // Integration line: Auth
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -208,7 +217,7 @@ public class ReactVaultTests extends ReactTestsBase {
         String testPassword = "testPassword123!";
 
         reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
-        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -238,7 +247,7 @@ public class ReactVaultTests extends ReactTestsBase {
         String testPassword = "testPassword123!";
 
         reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
-        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -251,7 +260,8 @@ public class ReactVaultTests extends ReactTestsBase {
 
         reactFunctions.changeUserRoleInUserManagementPopup(page, testUsername, "MANAGER");
 
-        Locator newRole = page.getByText("MANAGER");
+        Locator newRole = page.locator(".user-row", new Page.LocatorOptions().setHasText(testUsername))
+                .getByText("MANAGER");
 
         newRole.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(newRole.isVisible(), "New role should be present in the user management popup");
@@ -266,7 +276,7 @@ public class ReactVaultTests extends ReactTestsBase {
         String testPassword = "testPassword123!";
 
         reactFunctions.registerAndEnable(page, testUsername, testEmail, testPassword);
-        reactFunctions.registerEnableAndLogin(page, username, email, password);
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);

@@ -6,6 +6,7 @@ import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
 import com.strangequark.utility.EnvUtility;
 
 import java.util.HashMap;
@@ -57,7 +58,13 @@ public class EmailFunctions {
         requestBody.put("templateName", templateName);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/get-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + getInitialSuperAccessToken()) // Integration line: Auth
+        );
+    }
+
+    public APIResponse getAllTemplateEmails() {
+        return apiRequestContext.get(EMAIL_BASE_URL + "/get-all-template-emails", RequestOptions.create()
+                .setHeader("Authorization", "Bearer " + getInitialSuperAccessToken()) // Integration line: Auth
         );
     }
 
@@ -83,7 +90,7 @@ public class EmailFunctions {
         requestBody.put("tokenPurpose", tokenPurpose);
 
         return apiRequestContext.post(EMAIL_BASE_URL + "/create-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + getInitialSuperAccessToken()) // Integration line: Auth
         );
     }
 
@@ -94,7 +101,7 @@ public class EmailFunctions {
         requestBody.put("templateName", templateName);
 
         return apiRequestContext.put(EMAIL_BASE_URL + "/update-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + getInitialSuperAccessToken()) // Integration line: Auth
         );
     }
 
@@ -103,7 +110,7 @@ public class EmailFunctions {
         requestBody.put("templateName", templateName);
 
         return apiRequestContext.delete(EMAIL_BASE_URL + "/delete-template-email", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + getInitialSuperAccessToken()) // Integration line: Auth
         );
     }
 
@@ -118,6 +125,10 @@ public class EmailFunctions {
         return apiRequestContext.post(EMAIL_BASE_URL + "/send-email", RequestOptions.create().setData(requestBody)
                 .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount("auth")) // Integration line: Auth
         );
+    }
+
+    private String getInitialSuperAccessToken() {
+        return new AuthFunctions(apiRequestContext).authenticateInitialSuperUser();
     }
 
 }

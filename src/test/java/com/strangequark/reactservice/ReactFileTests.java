@@ -236,7 +236,8 @@ public class ReactFileTests extends ReactTestsBase {
 
         reactFunctions.changeUserRoleInUserManagementPopup(page, testUsername, "MANAGER");
 
-        Locator newRole = page.getByText("MANAGER");
+        Locator newRole = page.locator(".user-row", new Page.LocatorOptions().setHasText(testUsername))
+                .getByText("MANAGER");
 
         newRole.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(newRole.isVisible(), "New role should be present in the user management popup");

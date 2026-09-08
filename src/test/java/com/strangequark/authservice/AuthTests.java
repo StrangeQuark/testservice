@@ -104,6 +104,36 @@ public class AuthTests {
         response = authFunctions.createInvitation(testEmail, accessToken);
         assertEquals(403, response.status(), "Service account without invitation authorization should be rejected");
     }
+
+    @Test
+    public void adminManagementEndpointsTest() {
+        String accessToken = authFunctions.authenticateInitialSuperUser();
+        APIResponse response = authFunctions.createInvitation(testEmail, accessToken);
+        assertTrue(response.ok(), "Invitation creation failed: " + response.status() + " - " + response.text());
+        JsonObject invitation = JsonParser.parseString(response.text()).getAsJsonObject();
+        String invitationId = invitation.get("id").getAsString();
+        String invitationToken = invitation.get("token").getAsString();
+
+        response = authFunctions.getAllInvitations(accessToken);
+        assertTrue(response.ok(), "Invitation list failed: " + response.status() + " - " + response.text());
+        assertTrue(response.text().contains(testEmail));
+
+        response = authFunctions.getAllRoles(accessToken);
+        assertTrue(response.ok(), "Role list failed: " + response.status() + " - " + response.text());
+        assertTrue(response.text().contains("SUPER"));
+
+        response = authFunctions.register(testUsername, testEmail, testPassword, invitationToken);
+        assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
+        response = authFunctions.getAdminUser(testUsername, accessToken);
+        assertTrue(response.ok(), "Admin user lookup failed: " + response.status() + " - " + response.text());
+        assertTrue(response.text().contains(testUsername));
+
+        response = authFunctions.deleteInvitation(invitationId, accessToken);
+        assertTrue(response.ok(), "Invitation deletion failed: " + response.status() + " - " + response.text());
+
+        response = authFunctions.deleteAllInvitations(accessToken);
+        assertTrue(response.ok(), "Invitation deletion failed: " + response.status() + " - " + response.text());
+    }
     // Integration function start: Email
     @Test
     public void enableUserTest() {
@@ -380,7 +410,7 @@ public class AuthTests {
     @Test
     public void updateEmailTest() {
         String accessToken = authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
-        testEmail = "new@email.com";
+        testEmail = "new_" + UUID.randomUUID() + "@email.com";
 
         APIResponse response = authFunctions.updateEmail(testEmail, testPassword, accessToken);
         assertTrue(response.ok(), "Update email failed: " + response.status() + " - " + response.text());
@@ -399,7 +429,7 @@ public class AuthTests {
     @Test
     public void updateUsernameTest() {
         String accessToken = authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
-        testUsername = "newUsername";
+        testUsername = "newUsername_" + UUID.randomUUID();
 
         APIResponse response = authFunctions.updateUsername(testUsername, testPassword, accessToken);
         assertTrue(response.ok(), "Update username failed: " + response.status() + " - " + response.text());
@@ -458,7 +488,7 @@ public class AuthTests {
 
         response = authFunctions.updateRole("SUPER", adminUsername, adminAccessToken);
         assertFalse(response.ok(), "ADMIN user should not promote itself to SUPER");
-        assertEquals(400, response.status());
+        assertEquals(403, response.status());
 
         response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
@@ -467,7 +497,7 @@ public class AuthTests {
 
         response = authFunctions.updateRole("SUPER", testUsername, adminAccessToken);
         assertFalse(response.ok(), "ADMIN user should not promote another user to SUPER");
-        assertEquals(400, response.status());
+        assertEquals(403, response.status());
 
         response = authFunctions.deleteUser(adminUsername, adminEmail, adminPassword);
         assertTrue(response.ok(), "Admin user cleanup failed: " + response.status() + " - " + response.text());
