@@ -80,7 +80,6 @@ public class ReactTestsBase {
         context = browser.newContext();
         page = context.newPage();
 
-        page.onConsoleMessage(msg -> System.out.println(msg.text()));
         page.onRequestFailed(req -> {
             if (!req.url().contains("http://maildev:1080/socket.io/"))
                 System.out.println("Request failed: " + req.url());
