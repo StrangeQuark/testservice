@@ -1,4 +1,4 @@
-# Integration file: GHA
+
 name: TestService CI
 
 on:
@@ -9,36 +9,38 @@ jobs:
     runs-on: [self-hosted, linux-agent]
 
     env:
-      VAULT_URL: ${{ secrets.VAULT_URL }} # Integration line: Vault
-      CICD_TOKEN: ${{ secrets.CICD_TOKEN }} # Integration line: Vault
+      VAULT_URL: ${{ secrets.VAULT_URL }}
+      CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
+      VAULTSERVICE_ENABLED: ${{ secrets.VAULTSERVICE_ENABLED }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        # Integration function start: Vault
+
       - name: Retrieve Env Vars
         run: |
-          echo "Requesting environment variables from Vault..."
+          if [ "$VAULTSERVICE_ENABLED" = "true" ]; then
+            echo "Requesting environment variables from Vault..."
 
-          response=$(curl -sS --fail-with-body \
-            -X POST \
-            -H "X-CICD-TOKEN: $CICD_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"serviceName":"testservice","environmentName":"e3"}' \
-            "$VAULT_URL/api/vault/cicd") || {
-              echo "Unable to retrieve environment variables from Vault"
+            response=$(curl -sS --fail-with-body \
+              -X POST \
+              -H "X-CICD-TOKEN: $CICD_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d '{"serviceName":"testservice","environmentName":"e3"}' \
+              "$VAULT_URL/api/vault/cicd") || {
+                echo "Unable to retrieve environment variables from Vault"
+                exit 1
+              }
+
+            if [ -z "$response" ]; then
+              echo "Vault returned an empty environment file"
               exit 1
-            }
+            fi
 
-          if [ -z "$response" ]; then
-            echo "Vault returned an empty environment file"
-            exit 1
+            printf '%s\n' "$response" > testservice.env
+            echo "Environment variables written to testservice.env"
           fi
 
-          printf '%s\n' "$response" > testservice.env
-
-          echo "Environment variables written to testservice.env"
-        # Integration function end: Vault
       - name: Deploy & Test
         run: |
           set -e

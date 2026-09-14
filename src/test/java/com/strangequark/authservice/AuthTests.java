@@ -1,4 +1,4 @@
-// Integration file: Auth
+
 
 package com.strangequark.authservice;
 
@@ -9,6 +9,7 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.*;
@@ -16,6 +17,8 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ExtentTestWatcher.class)
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class AuthTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
@@ -134,7 +137,7 @@ public class AuthTests {
         response = authFunctions.deleteAllInvitations(accessToken);
         assertTrue(response.ok(), "Invitation deletion failed: " + response.status() + " - " + response.text());
     }
-    // Integration function start: Email
+
     @Test
     public void enableUserTest() {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
@@ -142,7 +145,7 @@ public class AuthTests {
 
         response = authFunctions.enableUser(testEmail);
         assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
-    }// Integration function end: Email
+    }
 
     @Test
     public void enableUserRejectsNonEmailServiceAccountTest() {
@@ -209,9 +212,9 @@ public class AuthTests {
     public void authenticateTest() {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
-        // Integration function start: Email
+
         response = authFunctions.enableUser(testEmail);
-        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
         response = authFunctions.authenticate(testUsername, testPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
@@ -221,9 +224,9 @@ public class AuthTests {
     public void serveAccessTokenTest() {
         APIResponse response = authFunctions.register(testUsername, testEmail, testPassword);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
-        // Integration function start: Email
+
         response = authFunctions.enableUser(testEmail);
-        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
         response = authFunctions.authenticate(testUsername, testPassword);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());
@@ -478,7 +481,7 @@ public class AuthTests {
         response = authFunctions.deleteUser(adminUsername, adminEmail, adminPassword);
         assertTrue(response.ok(), "Admin user cleanup failed: " + response.status() + " - " + response.text());
     }
-    // Integration function start: Email
+
     @Test
     public void sendPasswordResetEmailTest() {
         String accessToken = authFunctions.registerEnableAuthenticateAccess(testUsername, testEmail, testPassword);
@@ -489,7 +492,7 @@ public class AuthTests {
         APIResponse missingUserResponse = authFunctions.sendPasswordResetEmail("missing_" + UUID.randomUUID() + "@email.com", accessToken);
         assertEquals(response.status(), missingUserResponse.status());
         assertEquals(response.text(), missingUserResponse.text());
-    } // Integration function end: Email
+    }
 
     @Test
     public void serviceAccountAuthenticationTest() {

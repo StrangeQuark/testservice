@@ -1,4 +1,4 @@
-// Integration file: File
+
 
 package com.strangequark.fileservice;
 
@@ -6,8 +6,8 @@ import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.FormData;
 import com.microsoft.playwright.options.RequestOptions;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
-import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions;
+import com.strangequark.utility.AuthUtility;
 import com.strangequark.utility.EnvUtility;
 
 import java.net.URISyntaxException;
@@ -18,25 +18,25 @@ import java.util.Map;
 
 public class FileFunctions {
     APIRequestContext apiRequestContext;
-    AuthFunctions authFunctions; // Integration function start: Auth
+    AuthFunctions authFunctions;
     AuthUtility authUtility;
 
     public String testUsername;
     public String testEmail;
-    public String testPassword;// Integration function end: Auth
+    public String testPassword;
 
     public static final String FILE_BASE_URL = EnvUtility.getEnvVar("FILE_BASE_URL");
-    public static final String GATEWAY_BASE_URL = EnvUtility.getEnvVar("GATEWAY_BASE_URL"); // Integration line: Gateway
+    public static final String GATEWAY_BASE_URL = EnvUtility.getEnvVar("GATEWAY_BASE_URL");
 
     public FileFunctions(APIRequestContext apiRequestContext) {
         this.apiRequestContext = apiRequestContext;
     }
-    // Integration function start: Auth
+
     public FileFunctions(APIRequestContext apiRequestContext, AuthFunctions authFunctions) {
         this(apiRequestContext);
         this.authFunctions = authFunctions;
-        this.authUtility = new AuthUtility(apiRequestContext); // Integration line: Auth
-    } // Integration function end: Auth
+        this.authUtility = new AuthUtility(apiRequestContext);
+    }
 
     public APIResponse healthcheck() {
         return apiRequestContext.get(FILE_BASE_URL + "/health");
@@ -47,7 +47,7 @@ public class FileFunctions {
         requestBody.put("collectionName", testCollectionName);
 
         return apiRequestContext.post(FILE_BASE_URL + "/new-collection", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -70,7 +70,7 @@ public class FileFunctions {
         requestBody.put("collectionName", testCollectionName);
 
         return apiRequestContext.delete(FILE_BASE_URL + "/delete-collection", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -80,7 +80,7 @@ public class FileFunctions {
             FormData formData = FormData.create().set("file", filePath).set("collectionName", testCollectionName);
 
             return apiRequestContext.post(FILE_BASE_URL + "/upload", RequestOptions.create().setMultipart(formData)
-                    .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                    .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
             );
         } catch (URISyntaxException ex) {
             throw new RuntimeException("Failed to load test file from resources", ex);
@@ -93,7 +93,7 @@ public class FileFunctions {
         requestBody.put("fileName", "testUploadFile.txt");
 
         return apiRequestContext.delete(FILE_BASE_URL + "/delete", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -102,7 +102,7 @@ public class FileFunctions {
         requestBody.put("collectionName", testCollectionName);
 
         return apiRequestContext.post(FILE_BASE_URL + "/get-all", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -112,20 +112,20 @@ public class FileFunctions {
         requestBody.put("fileName", fileName);
 
         return apiRequestContext.post(FILE_BASE_URL + "/download", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
     public APIResponse streamFile(String testCollectionName, String fileName, String range) {
         return apiRequestContext.get(FILE_BASE_URL + "/stream?collectionName=" + testCollectionName + "&fileName=" + fileName, RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
                 .setHeader("Range", range)
         );
     }
-    // Integration function start: Gateway
+
     public APIResponse streamFileThroughGateway(String testCollectionName, String fileName, String range) {
         return apiRequestContext.get(GATEWAY_BASE_URL + "/api/file/stream?collectionName=" + testCollectionName + "&fileName=" + fileName, RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
                 .setHeader("Origin", "http://localhost:6080")
                 .setHeader("Range", range)
         );
@@ -139,14 +139,14 @@ public class FileFunctions {
                 .setHeader("Access-Control-Request-Headers", "authorization,range")
         );
     }
-    // Integration function end: Gateway
-    // Integration function start: Auth
+
+
     public APIResponse getCurrentUserRole(String testCollectionName) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("collectionName", testCollectionName);
 
         return apiRequestContext.post(FILE_BASE_URL + "/get-current-user-role", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -155,13 +155,13 @@ public class FileFunctions {
         requestBody.put("collectionName", testCollectionName);
 
         return apiRequestContext.post(FILE_BASE_URL + "/get-users-by-collection", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
     public APIResponse getAllRoles() {
         return apiRequestContext.get(FILE_BASE_URL + "/get-all-roles", RequestOptions.create()
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -172,7 +172,7 @@ public class FileFunctions {
         requestBody.put("role", "READ_WRITE");
 
         return apiRequestContext.post(FILE_BASE_URL + "/add-user-to-collection", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -183,7 +183,7 @@ public class FileFunctions {
         requestBody.put("role", newRole);
 
         return apiRequestContext.post(FILE_BASE_URL + "/update-user-role", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -193,7 +193,7 @@ public class FileFunctions {
         requestBody.put("username", testUsername);
 
         return apiRequestContext.post(FILE_BASE_URL + "/delete-user-from-collection", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
     }
 
@@ -202,7 +202,7 @@ public class FileFunctions {
         requestBody.put("username", testUsername);
 
         return apiRequestContext.post(FILE_BASE_URL + "/delete-user-from-all-collections", RequestOptions.create().setData(requestBody)
-                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount()) // Integration line: Auth
+                .setHeader("Authorization", "Bearer " + authUtility.authenticateServiceAccount())
         );
-    }// Integration function end: Auth
+    }
 }

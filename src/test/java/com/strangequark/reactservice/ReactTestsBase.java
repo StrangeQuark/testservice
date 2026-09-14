@@ -1,11 +1,11 @@
-// Integration file: React
+
 
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
-import com.strangequark.utility.AuthUtility; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions;
+import com.strangequark.utility.AuthUtility;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +29,13 @@ public class ReactTestsBase {
     public final Locator.WaitForOptions WAIT_FOR_DETACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.DETACHED);
     public final Locator.WaitForOptions WAIT_FOR_ATTACHED = new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED);
 
-    public static APIRequestContext apiRequestContext; // Integration function start: Auth
+    public static APIRequestContext apiRequestContext;
     public AuthFunctions authFunctions;
     public String username;
     public String email;
     public String password;
-    public AuthUtility authUtility;// Integration function end: Auth
-    public String collectionName;// Integration function start: File
+    public AuthUtility authUtility;
+    public String collectionName;
     public String textFileName;
     public Path textFilePath;
     public String audioFileName;
@@ -43,23 +43,23 @@ public class ReactTestsBase {
     public String imageFileName;
     public Path imageFilePath;
     public String videoFileName;
-    public Path videoFilePath;// Integration function end: File
-    public String serviceName;// Integration function start: Vault
+    public Path videoFilePath;
+    public String serviceName;
     public String environmentName;
     public String testVariableKey;
     public String testVariableValue;
     public String envFileName;
     public Path envFilePath;
-    // Integration function end: Vault
+
 
     @BeforeAll
     public void beforeAll() throws URISyntaxException {
         playwright = Playwright.create();
-        apiRequestContext = playwright.request().newContext(); // Integration line: Auth
-        authFunctions = new AuthFunctions(apiRequestContext);// Integration line: Auth
+        apiRequestContext = playwright.request().newContext();
+        authFunctions = new AuthFunctions(apiRequestContext);
         reactFunctions = new ReactFunctions(authFunctions);
-        authUtility = new AuthUtility(apiRequestContext);// Integration line: Auth
-        textFileName = "testUploadFile.txt";// Integration function start: File
+        authUtility = new AuthUtility(apiRequestContext);
+        textFileName = "testUploadFile.txt";
         textFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + textFileName).toURI());
         audioFileName = "testAudioFile.mp3";
         audioFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + audioFileName).toURI());
@@ -67,11 +67,11 @@ public class ReactTestsBase {
         imageFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + imageFileName).toURI());
         videoFileName = "testVideoFile.webm";
         videoFilePath = Paths.get(getClass().getClassLoader().getResource("fileserviceTestFiles/" + videoFileName).toURI());
-        // Integration function end: File
-        // Integration function start: Vault
+
+
         envFileName = "testEnvFile.env";
         envFilePath = Paths.get(getClass().getClassLoader().getResource("vaultserviceTestFiles/" + envFileName).toURI());
-        // Integration function end: Vault
+
     }
 
     @BeforeEach
@@ -86,28 +86,28 @@ public class ReactTestsBase {
                 System.out.println("Request failed: " + req.url());
         });
 
-        // Integration function start: Auth
+
         if(testInfo.getTestMethod().get().getName().startsWith("user")) {
             username = "test_" + UUID.randomUUID();
             email = username + "@testEmail.com";
             password = "testPassword123!";
-        }// Integration function end: Auth
-        collectionName = "collection_" + UUID.randomUUID();// Integration line: File
-        serviceName = "service_" + UUID.randomUUID();// Integration function start: Vault
+        }
+        collectionName = "collection_" + UUID.randomUUID();
+        serviceName = "service_" + UUID.randomUUID();
         environmentName = "environment_" + UUID.randomUUID();
         testVariableKey = "testKey_" + UUID.randomUUID().toString().replace("-", "_");
         testVariableValue = "testValue_" + UUID.randomUUID();
-        // Integration function end: Vault
+
     }
 
     @AfterEach
     public void afterEach(TestInfo testInfo) {
         try {
-            // Integration function start: Auth
+
             if(testInfo.getTestMethod().get().getName().startsWith("user")) {
                 authFunctions.deleteUser(username, email, password);
                 assertFalse(authFunctions.getUserId(username, authUtility.authenticateServiceAccount()).ok(), "User cleanup failed in React service register test");
-            }// Integration function end: Auth
+            }
         } finally {
             if(page != null)
                 page.close();
@@ -120,7 +120,7 @@ public class ReactTestsBase {
 
     @AfterAll
     public void afterAll() {
-        apiRequestContext.dispose(); // Integration line: Auth
+        apiRequestContext.dispose();
         playwright.close();
     }
 }

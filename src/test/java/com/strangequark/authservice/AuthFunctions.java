@@ -1,4 +1,4 @@
-// Integration file: Auth
+
 
 package com.strangequark.authservice;
 
@@ -295,9 +295,9 @@ public class AuthFunctions {
     public String registerEnableAuthenticateAccess(String username, String email, String password) {
         APIResponse response = register(username, email, password);
         assertTrue(response.ok(), "Registration failed: " + response.status() + " - " + response.text());
-        // Integration function start: Email
+
         response = enableUser(email);
-        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text()); // Integration function end: Email
+        assertTrue(response.ok(), "Enablement failed: " + response.status() + " - " + response.text());
 
         response = authenticate(username, password);
         assertTrue(response.ok(), "Authentication failed: " + response.status() + " - " + response.text());

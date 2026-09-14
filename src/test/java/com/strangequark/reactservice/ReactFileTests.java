@@ -1,16 +1,21 @@
-// Integration file: React
-// Integration file: File
+
+
 
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
-import java.util.UUID;// Integration line: Auth
+import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnabledIfEnvironmentVariable(named = "FILESERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "REACTSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class ReactFileTests extends ReactTestsBase {
-    // Integration function start: Auth
+
     @Test
     public void ensureToolbarFilesButtonRedirectsToLoginTest() {
         reactFunctions.navigateToLogin(page);
@@ -23,10 +28,10 @@ public class ReactFileTests extends ReactTestsBase {
         assertTrue(loginDiv.isVisible(), "Login div should be visible after clicking the Files button on the " +
                 "toolbar without logging in");
     }
-    // Integration function end: Auth
+
     @Test
     public void userCreateCollectionTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -39,7 +44,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userUploadFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -56,7 +61,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userDownloadFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -71,16 +76,14 @@ public class ReactFileTests extends ReactTestsBase {
 
         String fileContent = reactFunctions.getFileContent(download.path());
 
-        String expectedContent = "// Integration file: File\n" +
-                "\n" +
-                "This text file is used for testing the Fileservice";
+        String expectedContent = "This text file is used for testing the Fileservice\n";
 
         assertEquals(expectedContent, fileContent, "Downloaded test file contents should match expected");
     }
 
     @Test
     public void userDeleteFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -99,7 +102,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userListenAudioFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -126,7 +129,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userStreamVideoFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -148,7 +151,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userViewImageFileTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -170,7 +173,7 @@ public class ReactFileTests extends ReactTestsBase {
 
     @Test
     public void userDeleteCollectionTest() {
-        reactFunctions.registerEnableAndLogin(page, username, email, password); // Integration line: Auth
+        reactFunctions.registerEnableAndLogin(page, username, email, password);
         reactFunctions.navigateToFiles(page);
 
         reactFunctions.fillAndSubmitCreateCollectionForm(page, collectionName);
@@ -187,7 +190,7 @@ public class ReactFileTests extends ReactTestsBase {
         collectionPageHeader.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(collectionPageHeader.isVisible(), "User should have been navigated to collection selection after deleting a collection");
     }
-    // Integration function start: Auth
+
     @Test
     public void userAddUserToCollectionTest() {
         String testUsername = "test_" + UUID.randomUUID();
@@ -271,5 +274,5 @@ public class ReactFileTests extends ReactTestsBase {
         assertFalse(testUser.isVisible(), "Test user should not be present in the user management popup after deletion");
 
         authFunctions.deleteUser(testUsername, testEmail, testPassword);
-    } // Integration function end: Auth
+    }
 }

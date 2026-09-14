@@ -1,4 +1,4 @@
-// Integration file: Auth
+
 
 package com.strangequark.authservice;
 
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ExtentTestWatcher.class)
 @Tag("rate-limit")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
 public class AuthRateLimitTests {
     private static final String AUTH_BASE_URL = EnvUtility.getEnvVar("AUTH_BASE_URL");
     private static Playwright playwright;

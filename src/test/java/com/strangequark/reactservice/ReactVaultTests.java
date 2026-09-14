@@ -1,15 +1,20 @@
-// Integration file: React
-// Integration file: Vault
+
+
 
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnabledIfEnvironmentVariable(named = "REACTSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "VAULTSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class ReactVaultTests extends ReactTestsBase {
     private void registerEnableAndLoginDeveloper() {
         reactFunctions.registerAndEnable(page, username, email, password);
@@ -20,7 +25,7 @@ public class ReactVaultTests extends ReactTestsBase {
         reactFunctions.fillAndSubmitLoginForm(page, username, password);
     }
 
-    // Integration function start: Auth
+
     @Test
     public void ensureToolbarVaultButtonRedirectsToLoginTest() {
         reactFunctions.navigateToLogin(page);
@@ -33,10 +38,10 @@ public class ReactVaultTests extends ReactTestsBase {
         assertTrue(loginDiv.isVisible(), "Login div should be visible after clicking the Vault button on the " +
                 "toolbar without logging in");
     }
-    // Integration function end: Auth
+
     @Test
     public void userCreateServiceTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -50,7 +55,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userCreateEnvironmentTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -67,7 +72,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userAddVariableTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -78,7 +83,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userUnmaskVariableTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -92,7 +97,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userCopyVariableTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -121,7 +126,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteVariableTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -137,7 +142,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userUploadEnvFileTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -152,7 +157,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDownloadEnvFileTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.createServiceEnvironmentAndVariable(page, serviceName, environmentName, testVariableKey, testVariableValue);
@@ -169,7 +174,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteEnvironmentTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -192,7 +197,7 @@ public class ReactVaultTests extends ReactTestsBase {
 
     @Test
     public void userDeleteServiceTest() {
-        registerEnableAndLoginDeveloper(); // Integration line: Auth
+        registerEnableAndLoginDeveloper();
         reactFunctions.navigateToVault(page);
 
         reactFunctions.fillAndSubmitCreateServiceForm(page, serviceName);
@@ -209,7 +214,7 @@ public class ReactVaultTests extends ReactTestsBase {
         assertFalse(serviceSelectOptions.allInnerTexts().contains(serviceName),
                 "Service name should be present in the dropdown after deletion");
     }
-    // Integration function start: Auth
+
     @Test
     public void userAddUserToCollectionTest() {
         String testUsername = "test_" + UUID.randomUUID();
@@ -296,5 +301,5 @@ public class ReactVaultTests extends ReactTestsBase {
         assertFalse(testUser.isVisible(), "Test user should not be present in the user management popup after deletion");
 
         authFunctions.deleteUser(testUsername, testEmail, testPassword);
-    } // Integration function end: Auth
+    }
 }
