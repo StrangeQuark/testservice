@@ -1,15 +1,16 @@
-// Integration file: Telemetry
+
 
 package com.strangequark.telemetryservice;
 
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
+@EnabledIfEnvironmentVariable(named = "TELEMETRYSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class TelemetryTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
@@ -45,7 +49,7 @@ public class TelemetryTests {
         assertTrue(response.ok(), "Telemetry service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
-    // Integration function start: Auth
+
     @Test
     public void unauthenticatedGetEventsTest() {
         APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
@@ -129,5 +133,5 @@ public class TelemetryTests {
         response = authFunctions.deleteUser(username, email, password);
         assertTrue(response.ok(), "User cleanup failed: " + response.status() + " - " + response.text());
     }
-    // Integration function end: Auth
+
 }

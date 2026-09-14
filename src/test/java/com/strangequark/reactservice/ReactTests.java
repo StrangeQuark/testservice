@@ -1,13 +1,15 @@
-// Integration file: React
+
 
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@EnabledIfEnvironmentVariable(named = "REACTSERVICE_INTEGRATION", matches = "true")
 public class ReactTests extends ReactTestsBase {
     @Test
     public void ensureHomePageLoadingTest() {

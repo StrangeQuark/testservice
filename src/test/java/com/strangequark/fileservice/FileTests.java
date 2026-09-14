@@ -1,4 +1,4 @@
-// Integration file: File
+
 
 package com.strangequark.fileservice;
 
@@ -8,9 +8,10 @@ import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.nio.file.Files;
@@ -22,11 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
+@EnabledIfEnvironmentVariable(named = "FILESERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class FileTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
     private static FileFunctions fileFunctions;
-    private static AuthFunctions authFunctions; // Integration line: Auth
+    private static AuthFunctions authFunctions;
 
     private String testCollectionName;
 
@@ -36,9 +40,9 @@ public class FileTests {
     public static void beforeAll() {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
-        authFunctions = new AuthFunctions(apiRequestContext); // Integration line: Auth
+        authFunctions = new AuthFunctions(apiRequestContext);
         fileFunctions = new FileFunctions(apiRequestContext
-                , authFunctions // Integration line: Auth
+                , authFunctions
         );
     }
 
@@ -79,7 +83,7 @@ public class FileTests {
         assertTrue(response.ok(), "File service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
-    // Integration function start: Auth
+
     @Test
     public void unauthenticatedGetAllCollectionsTest() {
         APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
@@ -119,7 +123,7 @@ public class FileTests {
 
         assertEquals(403, response.status());
     }
-    // Integration function end: Auth
+
 
     @Test
     public void createCollectionTest() {
@@ -235,8 +239,9 @@ public class FileTests {
 
         assertEquals(416, response.status());
     }
-    // Integration function start: Gateway
+
     @Test
+    @EnabledIfEnvironmentVariable(named = "GATEWAYSERVICE_INTEGRATION", matches = "true")
     public void gatewayPassesFileCorsHeadersTest() {
         APIResponse response = fileFunctions.upload(testCollectionName, TEXT_TEST_FILE);
         assertTrue(response.ok(), "File upload setup failed: " + response.status() + " - " + response.text());
@@ -255,8 +260,8 @@ public class FileTests {
         response = fileFunctions.preflightThroughGateway(testCollectionName, TEXT_TEST_FILE, "http://not-allowed.example");
         assertEquals(403, response.status());
     }
-    // Integration function end: Gateway
-    // Integration function start: Auth
+
+
     @Test
     public void getCurrentUserRoleTest() {
         APIResponse response = fileFunctions.getCurrentUserRole(testCollectionName);
@@ -391,5 +396,5 @@ public class FileTests {
 
         authFunctions.deleteUser(fileFunctions.testUsername, fileFunctions.testEmail, fileFunctions.testPassword);
         assertTrue(response.ok(), "Delete user in delete user from all collections test failed: " + response.status() + " - " + response.text());
-    } // Integration function end: Auth
+    }
 }

@@ -1,4 +1,4 @@
-// Integration file: Telemetry
+
 
 package com.strangequark.telemetryservice;
 

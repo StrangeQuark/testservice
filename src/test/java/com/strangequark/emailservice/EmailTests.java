@@ -1,4 +1,4 @@
-// Integration file: Email
+
 
 package com.strangequark.emailservice;
 
@@ -10,6 +10,7 @@ import com.microsoft.playwright.Playwright;
 import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
@@ -20,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ExtentTestWatcher.class)
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
 public class EmailTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
@@ -44,7 +47,7 @@ public class EmailTests {
         assertTrue(response.ok(), "Email service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
-    // Integration function start: Auth
+
     @Test
     public void unauthenticatedSendEmailTest() {
         APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
@@ -62,7 +65,7 @@ public class EmailTests {
 
         assertEquals(401, response.status());
     }
-    // Integration function end: Auth
+
 
     @Test
     public void sendEmailTest() {

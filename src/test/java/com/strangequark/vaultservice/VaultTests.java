@@ -1,4 +1,4 @@
-// Integration file: Vault
+
 
 package com.strangequark.vaultservice;
 
@@ -8,9 +8,10 @@ import com.google.gson.JsonParser;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
-import com.strangequark.authservice.AuthFunctions; // Integration line: Auth
+import com.strangequark.authservice.AuthFunctions;
 import com.strangequark.utility.ExtentTestWatcher;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.nio.file.Files;
@@ -23,11 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ExtentTestWatcher.class)
+@EnabledIfEnvironmentVariable(named = "VAULTSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class VaultTests {
     private static Playwright playwright;
     private static APIRequestContext apiRequestContext;
     private static VaultFunctions vaultFunctions;
-    private static AuthFunctions authFunctions; // Integration line: Auth
+    private static AuthFunctions authFunctions;
 
     private String testServiceName;
     private String testEnvironmentName;
@@ -40,9 +44,9 @@ public class VaultTests {
     public static void beforeAll() {
         playwright = Playwright.create();
         apiRequestContext = playwright.request().newContext();
-        authFunctions = new AuthFunctions(apiRequestContext); // Integration line: Auth
+        authFunctions = new AuthFunctions(apiRequestContext);
         vaultFunctions = new VaultFunctions(apiRequestContext
-                , authFunctions // Integration line: Auth
+                , authFunctions
         );
     }
 
@@ -96,7 +100,7 @@ public class VaultTests {
         assertTrue(response.ok(), "Vault service healthcheck failed: " + response.status() + " - " + response.text());
     }
 
-    // Integration function start: Auth
+
     @Test
     public void unauthenticatedGetAllServicesTest() {
         APIRequestContext unauthenticatedRequestContext = playwright.request().newContext();
@@ -146,7 +150,7 @@ public class VaultTests {
         assertEquals(401, response.status());
         unauthenticatedRequestContext.dispose();
     }
-    // Integration function end: Auth
+
 
     @Test
     public void createServiceTest() {
@@ -366,7 +370,7 @@ public class VaultTests {
 
         assertTrue(jsonArray.toString().contains(testServiceName), "Get all services return failed");
     }
-    // Integration function start: Auth
+
     @Test
     public void getUsersByServiceTest() {
         APIResponse response = vaultFunctions.getUsersByService(testServiceName);
@@ -558,5 +562,5 @@ public class VaultTests {
 
         response = authFunctions.deleteUser(bootstrapUsername, bootstrapEmail, bootstrapPassword);
         assertTrue(response.ok(), "Bootstrap user cleanup failed: " + response.status() + " - " + response.text());
-    }// Integration function end: Auth
+    }
 }

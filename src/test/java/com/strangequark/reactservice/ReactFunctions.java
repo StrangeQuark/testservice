@@ -1,4 +1,4 @@
-// Integration file: React
+
 
 package com.strangequark.reactservice;
 
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReactFunctions {
     public static final String REACT_BASE_URL = EnvUtility.getEnvVar("REACT_BASE_URL");
-    public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL"); // Integration line: Email
+    public static final String MAILDEV_BASE_URL = EnvUtility.getEnvVar("MAILDEV_BASE_URL");
     private final AuthFunctions authFunctions;
 
     public ReactFunctions(AuthFunctions authFunctions) {
@@ -38,7 +38,7 @@ public class ReactFunctions {
                 dialog.dismiss();
         });
     }
-    // Integration function start: Auth
+
     public void navigateToLogin(Page page) {
         page.navigate(REACT_BASE_URL + "/login");
     }
@@ -99,7 +99,7 @@ public class ReactFunctions {
     public void registerAndEnable(Page page, String username, String email, String password) {
         navigateToRegister(page, email);
         fillAndSubmitRegisterForm(page, username, email, password);
-        // Integration function start: Email
+
         navigateToMailbox(page);
         page.getByPlaceholder("Search emails...").fill(email);
 
@@ -119,7 +119,7 @@ public class ReactFunctions {
 
         page.navigate(confirmUrl);
         page.locator("id=message-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        // Integration function end: Email
+
     }
 
     public void registerEnableAndLogin(Page page, String username, String email, String password) {
@@ -195,8 +195,8 @@ public class ReactFunctions {
         Locator userRow = page.locator(".user-row", new Page.LocatorOptions().setHasText(username));
         userRow.getByTestId("delete-user-button").click();
     }
-    // Integration function end: Auth
-    // Integration function start: Email
+
+
     public void navigateToPasswordReset(Page page) {
         page.navigate(REACT_BASE_URL + "/password-reset");
     }
@@ -229,8 +229,8 @@ public class ReactFunctions {
         page.navigate(resetUrl);
         page.locator("id=request-div").waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
-    // Integration function end: Email
-    // Integration function start: File
+
+
     public void clickToolbarFilesButton(Page page) {
         page.getByTestId("files-nav-link").click();
     }
@@ -291,8 +291,8 @@ public class ReactFunctions {
     public void clickViewFile(Page page) {
         page.getByText("View").click();
     }
-    // Integration function end: File
-    // Integration function start: Vault
+
+
     public void clickToolbarVaultButton(Page page) {
         page.getByTestId("vault-nav-link").click();
     }
@@ -387,5 +387,5 @@ public class ReactFunctions {
 
         variableKeyInput.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
-    // Integration function end: Vault
+
 }

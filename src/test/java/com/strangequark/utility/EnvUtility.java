@@ -3,6 +3,10 @@ package com.strangequark.utility;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class EnvUtility {
+    public static boolean isIntegrationEnabled(String integrationName) {
+        return Boolean.parseBoolean(getEnvVar(integrationName + "SERVICE_INTEGRATION"));
+    }
+
     public static String getEnvVar(String varName) {
         String envVar = System.getenv(varName);
         if(envVar == null || envVar.isEmpty()) {

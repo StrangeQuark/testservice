@@ -1,15 +1,19 @@
-// Integration file: React
-// Integration file: Auth
+
+
 
 package com.strangequark.reactservice;
 
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnabledIfEnvironmentVariable(named = "AUTHSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "REACTSERVICE_INTEGRATION", matches = "true")
+@EnabledIfEnvironmentVariable(named = "EMAILSERVICE_INTEGRATION", matches = "true")
 public class ReactAuthTests extends ReactTestsBase {
     @Test
     public void ensureLoginDivLoadingTest() {
@@ -176,7 +180,7 @@ public class ReactAuthTests extends ReactTestsBase {
         administrationHeader.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(administrationHeader.isVisible(), "SUPER user should be able to view the administration page");
     }
-    // Integration function start: Email
+
     @Test
     public void ensurePasswordResetDivLoadingTest() {
         reactFunctions.navigateToPasswordReset(page);
@@ -244,5 +248,5 @@ public class ReactAuthTests extends ReactTestsBase {
         usernameButton.waitFor(WAIT_FOR_VISIBLE);
         assertTrue(usernameButton.isVisible(), "User should be able to log in with the reset password");
     }
-    // Integration function end: Email
+
 }
