@@ -73,6 +73,8 @@ public class ReactFunctions {
         page.click("id=submit-button");
 
         page.waitForURL(REACT_BASE_URL + "/");
+        page.locator("id=userButton")
+                .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
     }
 
     public void fillAndSubmitPasswordResetForm(Page page, String username) {

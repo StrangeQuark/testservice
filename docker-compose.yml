@@ -16,7 +16,8 @@ services:
       - SERVICE_SECRET_TEST=${SERVICE_SECRET_TEST}
       - SERVICE_SECRET_AUTH=${SERVICE_SECRET_AUTH}
       - SERVICE_SECRET_EMAIL=${SERVICE_SECRET_EMAIL}
-      - INITIAL_SUPER_CREDENTIALS_FILE=/bootstrap/initial-super-user.txt
+      - INITIAL_SUPER_USERNAME=${INITIAL_SUPER_USERNAME}
+      - INITIAL_SUPER_PASSWORD=${INITIAL_SUPER_PASSWORD}
       - AUTH_BASE_URL=${AUTH_BASE_URL}
       - GATEWAY_BASE_URL=${GATEWAY_BASE_URL}
       - EMAIL_BASE_URL=${EMAIL_BASE_URL}
@@ -27,7 +28,6 @@ services:
       - TELEMETRY_BASE_URL=${TELEMETRY_BASE_URL}
     volumes:
       - ./test-results:/testservice/test-results
-      - ${INITIAL_SUPER_CREDENTIALS_DIRECTORY:-/tmp}:/bootstrap:ro
 networks:
   shared-network:
     external: true

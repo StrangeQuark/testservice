@@ -80,12 +80,6 @@ public class ReactTestsBase {
         context = browser.newContext();
         page = context.newPage();
 
-        page.onRequestFailed(req -> {
-            if (!req.url().contains("http://maildev:1080/socket.io/"))
-                System.out.println("Request failed: " + req.url());
-        });
-
-
         if(testInfo.getTestMethod().get().getName().startsWith("user")) {
             username = "test_" + UUID.randomUUID();
             email = username + "@testEmail.com";
