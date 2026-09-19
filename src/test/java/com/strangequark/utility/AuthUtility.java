@@ -7,8 +7,6 @@ import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
 import com.strangequark.authservice.AuthFunctions;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,14 +28,8 @@ public class AuthUtility {
 
         SERVICE_SECRET_EMAIL = EnvUtility.getEnvVar("SERVICE_SECRET_EMAIL");
 
-        try {
-            String[] credentials = Files.readString(Path.of(EnvUtility.getEnvVar("INITIAL_SUPER_CREDENTIALS_FILE")))
-                    .split("\\n");
-            INITIAL_SUPER_USERNAME = credentials[0].replace("Username: ", "");
-            INITIAL_SUPER_PASSWORD = credentials[1].replace("Password: ", "");
-        } catch (Exception ex) {
-            throw new RuntimeException("Unable to read initial SUPER user credentials", ex);
-        }
+        INITIAL_SUPER_USERNAME = EnvUtility.getEnvVar("INITIAL_SUPER_USERNAME");
+        INITIAL_SUPER_PASSWORD = EnvUtility.getEnvVar("INITIAL_SUPER_PASSWORD");
     }
 
     public String authenticateServiceAccount() {
